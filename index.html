@@ -17,27 +17,30 @@
   body{
     background:#000000;
     font-family:"Consolas","Lucida Console","Courier New",monospace;
-    display:flex; flex-direction:column; align-items:center; padding:36px 14px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px 14px; min-height:100vh;
   }
   .phone{
-    width:340px; background:#0A0A0A; border-radius:34px; padding:14px 10px;
+    width:340px; height:min(700px, calc(100vh - 48px)); background:#0A0A0A; border-radius:34px; padding:14px 10px;
     box-shadow:0 0 0 2px #2A2A2A, 0 20px 50px rgba(0,0,0,.6);
+    display:flex; flex-direction:column;
   }
   .notch{
     width:90px; height:16px; background:#0A0A0A; border-radius:0 0 10px 10px;
-    margin:0 auto 8px; box-shadow:0 0 0 2px #2A2A2A;
+    margin:0 auto 8px; box-shadow:0 0 0 2px #2A2A2A; flex-shrink:0;
   }
   .crt{
     width:100%; background:var(--bg); color:var(--fg);
     padding:0; font-size:12.5px; line-height:1.5;
     border-top:4px double var(--fg-dim); border-bottom:4px double var(--fg-dim);
-    position:relative;
+    position:relative; flex:1; display:flex; flex-direction:column; min-height:0;
   }
   .titlebar{
     color:var(--fg); font-weight:bold; text-align:center;
     padding:5px 4px; letter-spacing:1px; border-bottom:1px solid var(--fg-dim); font-size:11px;
+    flex-shrink:0;
   }
-  .inner{padding:8px 12px 8px;}
+  .inner{padding:8px 12px 8px; flex:1; overflow-y:auto;}
   .screen{display:none;}
   .screen.active{display:block;}
   .kicker{color:var(--fg-dim); font-weight:bold;}
@@ -71,6 +74,7 @@
   .panel.hero{border-style:double; border-width:3px; padding:10px 14px;}
   .panel.hero .big{color:var(--fg); font-weight:bold; font-size:16px; margin:4px 0;}
   .panel.action{text-align:center; cursor:pointer; color:var(--fg); font-weight:bold;}
+  .panel.action.danger{color:var(--fg-dim); font-weight:normal;}
   .bar-row{display:flex; align-items:center; gap:6px; margin:3px 0; font-size:11px;}
   .bar-track{flex:1; height:9px; border:1px solid var(--fg-dim); position:relative;}
   .bar-fill{position:absolute; top:0; left:0; bottom:0; background:var(--fg);}
@@ -116,11 +120,11 @@
   .modal{width:100%;}
   .modal-field{margin:8px 0 0; display:flex; flex-direction:column; gap:3px;}
   .modal-field label{color:var(--fg-dim); font-size:10px; text-transform:uppercase; letter-spacing:.5px;}
-  .modal-field input{
+  .modal-field input, .modal-field select{
     background:#000; border:1px solid var(--fg-dim); color:var(--fg);
     font-family:inherit; font-size:12px; padding:5px 6px; color-scheme:dark; width:100%;
   }
-  .modal-field input:focus{outline:1px solid var(--fg);}
+  .modal-field input:focus, .modal-field select:focus{outline:1px solid var(--fg);}
   .modal-actions{display:flex; gap:18px; margin-top:12px; justify-content:center;}
   .modal-error{color:var(--fg); font-weight:bold; font-size:10.5px; margin-top:6px; min-height:12px;}
 </style>
@@ -134,8 +138,7 @@
     <div class="inner">
 
       <div id="screen-home" class="screen active">
-        <div class="kicker" id="lbl-kicker-home">РИТМ СОБЫТИЙ</div>
-        <div class="h-title"><span id="lbl-cycles">Ваши циклы</span><span class="cursor"></span></div>
+        <div class="kicker" id="lbl-kicker-home" style="margin-bottom:10px;">РИТМ СОБЫТИЙ<span class="cursor"></span></div>
 
         <div class="twrap">
         <table>
@@ -150,6 +153,7 @@
         </div>
 
         <div class="panel" id="home-summary"></div>
+        <div class="panel action" id="lbl-new-type-btn" onclick="openNewType()">[ + Новый тип ]</div>
       </div>
 
       <div id="screen-detail" class="screen">
@@ -180,6 +184,7 @@
         <div class="panel" id="detail-last"></div>
 
         <div class="panel action" id="lbl-add-manual" onclick="openManualEntry(currentType)">[ + Ввести вручную ]</div>
+        <div class="panel action danger" id="lbl-delete-type" onclick="deleteCurrentType()">[ Удалить тип ]</div>
       </div>
 
       <div id="screen-analytics" class="screen">
@@ -230,19 +235,44 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="type-modal-overlay">
+      <div class="modal panel hero">
+        <div class="kicker" id="lbl-type-modal-title">НОВЫЙ ТИП СОБЫТИЯ</div>
+        <div class="modal-field">
+          <label id="lbl-type-name">Название</label>
+          <input type="text" id="type-name-input" maxlength="30">
+        </div>
+        <div class="modal-field">
+          <label id="lbl-type-measure">Что измеряем</label>
+          <select id="type-measure-input">
+            <option value="duration" id="opt-duration">Длительность (время)</option>
+            <option value="quantity" id="opt-quantity">Количество</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label id="lbl-type-unit">Единица измерения</label>
+          <input type="text" id="type-unit-input" maxlength="10" placeholder="мин, ч, л, шт...">
+        </div>
+        <div class="modal-actions">
+          <span class="cal-nav-btn" id="btn-type-save" onclick="submitNewType()">[ Создать ]</span>
+          <span class="cal-nav-btn" id="btn-type-cancel" onclick="closeNewType()">[ Отмена ]</span>
+        </div>
+        <div class="modal-error" id="type-modal-error"></div>
+      </div>
+    </div>
+
     <div class="footer">
       <span onclick="showScreen('help')"><span class="fkey">F1</span> <span id="lbl-f1">Помощь</span></span>
       <span onclick="openManualEntry(currentType)"><span class="fkey">F2</span> <span id="lbl-f2">Запись</span></span>
       <span onclick="showScreen('home')"><span class="fkey">F3</span> <span id="lbl-f3">Отмена</span></span>
       <span onclick="openDetail()"><span class="fkey">F4</span> <span id="lbl-f4">Детали</span></span>
-      <span><span class="fkey">F5</span> <span id="lbl-f5">Новый тип</span></span>
+      <span onclick="openNewType()"><span class="fkey">F5</span> <span id="lbl-f5">Новый тип</span></span>
       <span onclick="toggleLang()"><span class="fkey">F8</span> <span id="lbl-f8">English</span></span>
       <span onclick="showScreen('analytics')"><span class="fkey">F9</span> <span id="lbl-f9">Аналитика</span></span>
       <span onclick="showScreen('home')"><span class="fkey">F10</span> <span id="lbl-f10">Главная</span></span>
     </div>
     </div>
   </div>
-  <p class="caption" id="lbl-caption">Вид как на экране телефона — в рамке 340px. Данные можно вносить вручную (кнопка «+ Ввести вручную» или F2) — прогноз и календарь пересчитываются сразу и сохраняются в браузере.</p>
 </div>
 
 <script>
@@ -259,7 +289,7 @@ const I18N = {
     titleAnalytics:'EVENTRHYTHM v1.0 — АНАЛИТИКА',
     titleHelp:'EVENTRHYTHM v1.0 — ПОМОЩЬ',
     titleDetailPrefix:'EVENTRHYTHM v1.0 — ',
-    kickerHome:'РИТМ СОБЫТИЙ', yourCycles:'Ваши циклы',
+    kickerHome:'РИТМ СОБЫТИЙ',
     thNum:'№', thEvent:'Событие', thStatus:'Статус', thCtrl:'Упр.',
     legendPassed:'прошло', legendLeft:'осталось', legendLittle:'мало данных',
     summaryLabel:'СВОДКА:', summaryTotal:'событий всего', summaryActive:'активных ритмов', summaryHighConf:'высокая увер.',
@@ -294,26 +324,40 @@ const I18N = {
     modalSave:'[ Сохранить ]', modalCancel:'[ Отмена ]',
     errDate:'Укажите дату.', errValue:'Введите значение больше нуля.',
     f1:'Помощь', f2:'Запись', f3:'Отмена', f4:'Детали', f5:'Новый тип', f9:'Аналитика', f10:'Главная',
-    caption:'Вид как на экране телефона — в рамке 340px. Данные можно вносить вручную (кнопка «+ Ввести вручную» или F2) — прогноз и календарь пересчитываются сразу и сохраняются в браузере.',
     monthNom:['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','ИЮНЬ','ИЮЛЬ','АВГУСТ','СЕНТЯБРЬ','ОКТЯБРЬ','НОЯБРЬ','ДЕКАБРЬ'],
     monthGen:['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'],
     dow:['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],
-    types:{haircut:'Стрижка', fuel:'Заправка', aurora:'Аврора', water:'Полив'},
-    units:{min:'мин', hour:'ч', liter:'л'},
+    newTypeBtn:'[ + Новый тип ]',
+    emptyTypes:'Пока нет ни одного типа события.',
+    emptyPrompt:'нажмите «+ Новый тип», чтобы добавить первый',
+    typeModalTitle:'НОВЫЙ ТИП СОБЫТИЯ',
+    typeNameLabel:'Название', typeMeasureLabel:'Что измеряем', typeUnitLabel:'Единица измерения',
+    typeUnitPlaceholder:'мин, ч, л, шт...',
+    optDuration:'Длительность (время)', optQuantity:'Количество',
+    typeSave:'[ Создать ]', typeCancel:'[ Отмена ]',
+    errTypeName:'Введите название.', errTypeUnit:'Укажите единицу измерения.',
+    deleteType:'[ Удалить тип ]',
+    confirmDeleteType:n=>'Удалить тип «'+n+'» и все его записи? Это необратимо.',
+    confirmReset:'Удалить все типы и записи и начать заново, как новый пользователь? Это необратимо.',
     help:{
       title:'Помощь',
       whatTitle:'ЧТО ЭТО',
-      whatText:'EventRhythm следит за повторяющимися событиями (стрижка, заправка, рабочие сессии и т.п.) и предсказывает, когда наступит следующее и сколько времени или объёма оно займёт — по истории ваших записей.',
+      whatText:'EventRhythm следит за повторяющимися событиями и предсказывает, когда наступит следующее и сколько времени или объёма оно займёт — по истории ваших записей. Типы событий полностью настраиваются под вас.',
       homeTitle:'ГЛАВНАЯ',
       homeText:'Таблица циклов. Статус — полоска из 6 клеток: залитые клетки = сколько времени уже прошло с прошлого события, пустые = сколько осталось до прогноза. Пунктир — мало данных, мигание — уже пора. Клик по строке открывает детали, [+] / [▶] — быстрая запись без перехода.',
       detailTitle:'ДЕТАЛИ',
       detailText:'Прогноз следующей даты и значения, тренд интервала (ускоряется / стабильно / замедляется), календарь на два месяца — «◀ Назад», «Сегодня», «Вперёд ▶» листают месяцы. Залитый день — прошедшее событие, пунктирный — окно прогноза. Кнопка «+ Ввести вручную» добавляет запись для текущего события.',
       manualTitle:'РУЧНОЙ ВВОД',
-      manualText:'Укажите дату и значение (минуты, часы или литры — в зависимости от типа события). Если на эту дату уже есть запись — она будет обновлена. Данные сохраняются в браузере и не пропадают при перезагрузке страницы.',
+      manualText:'Укажите дату и значение. Если на эту дату уже есть запись — она будет обновлена. Данные сохраняются в браузере и не пропадают при перезагрузке страницы.',
+      manageTitle:'СВОИ ТИПЫ СОБЫТИЙ',
+      manageText:'Кнопка «+ Новый тип» на главной (или F5) — создать свой тип: название, что измерять (время или количество) и единица. На экране деталей внизу — «Удалить тип», чтобы убрать ненужный вместе со всеми его записями.',
       analyticsTitle:'АНАЛИТИКА',
       analyticsText:'Сводные цифры по всем циклам, уверенность прогноза (зависит от числа записей и стабильности интервалов между ними) и тренд по каждому событию.',
+      resetTitle:'СБРОС',
+      resetText:'Если хотите начать с чистого листа — как новый пользователь, без демо-данных Стрижка/Заправка/Аврора/Полив — кнопка ниже удалит всё и даст создать только свои типы.',
+      resetBtn:'[ Начать с чистого листа ]',
       keysTitle:'ГОРЯЧИЕ КЛАВИШИ',
-      keysText:'F1 Помощь · F2 Новая запись · F3 Отмена / на главную · F4 Детали текущего события · F8 Смена языка · F9 Аналитика · F10 Главная'
+      keysText:'F1 Помощь · F2 Новая запись · F3 Отмена / на главную · F4 Детали текущего события · F5 Новый тип · F8 Смена языка · F9 Аналитика · F10 Главная'
     }
   },
   en: {
@@ -322,7 +366,7 @@ const I18N = {
     titleAnalytics:'EVENTRHYTHM v1.0 — ANALYTICS',
     titleHelp:'EVENTRHYTHM v1.0 — HELP',
     titleDetailPrefix:'EVENTRHYTHM v1.0 — ',
-    kickerHome:'LIFE RHYTHM', yourCycles:'Your cycles',
+    kickerHome:'LIFE RHYTHM',
     thNum:'No.', thEvent:'Event', thStatus:'Status', thCtrl:'Act.',
     legendPassed:'elapsed', legendLeft:'remaining', legendLittle:'not enough data',
     summaryLabel:'SUMMARY:', summaryTotal:'events total', summaryActive:'active rhythms', summaryHighConf:'high confidence',
@@ -357,26 +401,40 @@ const I18N = {
     modalSave:'[ Save ]', modalCancel:'[ Cancel ]',
     errDate:'Please enter a date.', errValue:'Enter a value greater than zero.',
     f1:'Help', f2:'Entry', f3:'Cancel', f4:'Details', f5:'New type', f9:'Analytics', f10:'Home',
-    caption:'Phone-screen view in a 340px frame. Data can be entered manually (the "+ Add manually" button or F2) — the forecast and calendar update instantly and are saved in the browser.',
     monthNom:['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'],
     monthGen:['January','February','March','April','May','June','July','August','September','October','November','December'],
     dow:['Mo','Tu','We','Th','Fr','Sa','Su'],
-    types:{haircut:'Haircut', fuel:'Fuel', aurora:'Aurora', water:'Watering'},
-    units:{min:'min', hour:'h', liter:'L'},
+    newTypeBtn:'[ + New type ]',
+    emptyTypes:'No event types yet.',
+    emptyPrompt:'press "+ New type" to add your first one',
+    typeModalTitle:'NEW EVENT TYPE',
+    typeNameLabel:'Name', typeMeasureLabel:'What to measure', typeUnitLabel:'Unit',
+    typeUnitPlaceholder:'min, h, L, pcs...',
+    optDuration:'Duration (time)', optQuantity:'Quantity',
+    typeSave:'[ Create ]', typeCancel:'[ Cancel ]',
+    errTypeName:'Enter a name.', errTypeUnit:'Enter a unit.',
+    deleteType:'[ Delete type ]',
+    confirmDeleteType:n=>'Delete type "'+n+'" and all its records? This cannot be undone.',
+    confirmReset:'Delete all types and records and start over as a new user? This cannot be undone.',
     help:{
       title:'Help',
       whatTitle:'WHAT THIS IS',
-      whatText:'EventRhythm tracks recurring events (haircuts, refuelling, work sessions, etc.) and predicts when the next one will happen and how long or how much it will take — based on the history of your entries.',
+      whatText:'EventRhythm tracks recurring events and predicts when the next one will happen and how long or how much it will take — based on the history of your entries. Event types are fully customizable.',
       homeTitle:'HOME',
       homeText:'Table of cycles. Status is a 6-cell bar: filled cells = how much time has passed since the last event, empty = how much is left until the forecast. Dashed = not enough data, blinking = due now. Click a row to open details, [+] / [▶] adds an entry without leaving the list.',
       detailTitle:'DETAILS',
       detailText:'Forecast of the next date and value, interval trend (speeding up / stable / slowing down), a two-month calendar — "◀ Back", "Today", "Next ▶" page through months. A filled day is a past event, a dashed one is the forecast window. The "+ Add manually" button logs an entry for the current event.',
       manualTitle:'MANUAL ENTRY',
-      manualText:'Enter a date and a value (minutes, hours, or liters — depending on the event type). If an entry already exists for that date, it will be updated. Data is saved in the browser and survives page reloads.',
+      manualText:'Enter a date and a value. If an entry already exists for that date, it will be updated. Data is saved in the browser and survives page reloads.',
+      manageTitle:'YOUR OWN EVENT TYPES',
+      manageText:'The "+ New type" button on the home screen (or F5) creates your own type: name, what to measure (time or quantity), and a unit. On the details screen, "Delete type" at the bottom removes one along with all its records.',
       analyticsTitle:'ANALYTICS',
       analyticsText:'Summary figures across all cycles, forecast confidence (depends on record count and how consistent the intervals are) and the trend for each event.',
+      resetTitle:'RESET',
+      resetText:'Want a clean start — as a new user, without the Haircut/Fuel/Aurora/Watering demo data? The button below deletes everything and lets you create only your own types.',
+      resetBtn:'[ Start fresh ]',
       keysTitle:'HOTKEYS',
-      keysText:'F1 Help · F2 New entry · F3 Cancel / home · F4 Details of current event · F8 Switch language · F9 Analytics · F10 Home'
+      keysText:'F1 Help · F2 New entry · F3 Cancel / home · F4 Details of current event · F5 New type · F8 Switch language · F9 Analytics · F10 Home'
     }
   }
 };
@@ -396,31 +454,29 @@ function saveLang(){
 // Данные: типы событий и их записи (дата + значение)
 // ---------------------------------------------------------------
 const TODAY = new Date(2026,7,20); // 20 августа 2026 — фиксированное "сегодня" для демо
-const ORDER = ['haircut','fuel','aurora','water'];
-const TYPES = {
-  haircut: { id:'haircut', measure:'duration', unitKey:'min', records:[
+let ORDER = ['haircut','fuel','aurora','water'];
+let TYPES = {
+  haircut: { id:'haircut', name:'Стрижка', measure:'duration', unit:'мин', records:[
     {date:'2026-05-09', value:47}, {date:'2026-05-30', value:49}, {date:'2026-06-20', value:46},
     {date:'2026-07-11', value:50}, {date:'2026-08-01', value:48}
   ]},
-  fuel: { id:'fuel', measure:'quantity', unitKey:'liter', records:[
+  fuel: { id:'fuel', name:'Заправка', measure:'quantity', unit:'л', records:[
     {date:'2026-03-30', value:43}, {date:'2026-04-29', value:45}, {date:'2026-05-29', value:44},
     {date:'2026-06-28', value:46}, {date:'2026-07-28', value:44}
   ]},
-  aurora: { id:'aurora', measure:'duration', unitKey:'hour', records:[
+  aurora: { id:'aurora', name:'Аврора', measure:'duration', unit:'ч', records:[
     {date:'2026-05-25', value:3.0}, {date:'2026-06-08', value:3.5}, {date:'2026-06-22', value:2.8},
     {date:'2026-07-06', value:4.0}, {date:'2026-07-20', value:3.2}, {date:'2026-08-03', value:3.6}
   ]},
-  water: { id:'water', measure:'quantity', unitKey:'liter', records:[
+  water: { id:'water', name:'Полив', measure:'quantity', unit:'л', records:[
     {date:'2026-08-15', value:2}
   ]}
 };
 
-const STORAGE_KEY = 'eventrhythm_pg_v1';
+const STORAGE_KEY = 'eventrhythm_pg_v2';
 function saveState(){
   try{
-    const data = {};
-    ORDER.forEach(id => { data[id] = TYPES[id].records; });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ order: ORDER, types: TYPES }));
   }catch(e){ /* localStorage недоступен — просто не сохраняем */ }
 }
 function loadState(){
@@ -428,8 +484,21 @@ function loadState(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return;
     const data = JSON.parse(raw);
-    ORDER.forEach(id => { if(Array.isArray(data[id])) TYPES[id].records = data[id]; });
+    if(Array.isArray(data.order) && data.types && typeof data.types==='object'){
+      ORDER = data.order;
+      TYPES = data.types;
+    }
   }catch(e){ /* игнорируем повреждённые данные */ }
+}
+function slugify(s){
+  const base = String(s).toLowerCase().trim().replace(/[^a-zа-яё0-9]+/gi,'-').replace(/^-+|-+$/g,'');
+  return base || 'type';
+}
+function generateTypeId(name){
+  const base = slugify(name);
+  let id = base, i = 2;
+  while(TYPES[id]){ id = base+'-'+i; i++; }
+  return id;
 }
 
 // ---------------------------------------------------------------
@@ -535,6 +604,16 @@ function statusTextAndClass(stats){
 }
 
 function renderHome(){
+  document.getElementById('lbl-new-type-btn').textContent = L().newTypeBtn;
+
+  if(ORDER.length===0){
+    document.getElementById('home-rows').innerHTML =
+      '<tr><td colspan="4" style="text-align:center; color:var(--fg-dim);">'+L().emptyTypes+'</td></tr>';
+    document.getElementById('home-summary').innerHTML =
+      '<span class="k">'+L().summaryLabel+'</span> '+L().emptyPrompt;
+    return;
+  }
+
   let rows='';
   let totalRecords=0, activeRhythms=0, highConf=0;
   ORDER.forEach(id => {
@@ -547,7 +626,7 @@ function renderHome(){
     const icon = t.measure==='duration' ? '▶' : '+';
     const selCls = id===currentType ? ' sel' : '';
     rows += '<tr class="'+selCls.trim()+'" onclick="openDetail(\''+id+'\')">'+
-      '<td>'+String(ORDER.indexOf(id)+1).padStart(2,'0')+'</td><td>'+L().types[id]+'</td>'+
+      '<td>'+String(ORDER.indexOf(id)+1).padStart(2,'0')+'</td><td>'+t.name+'</td>'+
       '<td class="'+st.cls+'"><span class="st-cell">'+segBarHtml(stats)+'<span class="st-txt">'+st.text+'</span></span></td>'+
       '<td class="btn-cell"><span class="act" onclick="event.stopPropagation(); openManualEntry(\''+id+'\')">['+icon+']</span></td>'+
     '</tr>';
@@ -565,14 +644,18 @@ let currentType = 'haircut';
 let currentStats = null;
 
 function renderDetail(){
+  document.getElementById('lbl-add-manual').textContent = L().addManual;
+  document.getElementById('lbl-delete-type').textContent = L().deleteType;
+
   const t = TYPES[currentType];
+  if(!t){ return; }
   currentStats = computeStats(t);
-  document.getElementById('detail-name').textContent = L().types[currentType];
+  document.getElementById('detail-name').textContent = t.name;
 
   const hero = document.getElementById('detail-hero');
   const trendEl = document.getElementById('detail-trend');
   const lastEl = document.getElementById('detail-last');
-  const unit = L().units[t.unitKey];
+  const unit = t.unit;
 
   if(currentStats.status==='cold'){
     hero.innerHTML =
@@ -612,9 +695,35 @@ function renderDetail(){
 }
 
 function openDetail(typeId){
+  if(ORDER.length===0) return;
   if(typeId) currentType = typeId;
+  if(!TYPES[currentType]) currentType = ORDER[0];
   showScreen('detail');
   renderDetail();
+}
+
+function deleteCurrentType(){
+  const t = TYPES[currentType];
+  if(!t) return;
+  if(!confirm(L().confirmDeleteType(t.name))) return;
+  delete TYPES[currentType];
+  ORDER = ORDER.filter(id => id!==currentType);
+  currentType = ORDER.length ? ORDER[0] : null;
+  saveState();
+  renderHome();
+  renderAnalytics();
+  showScreen('home');
+}
+
+function resetAllData(){
+  if(!confirm(L().confirmReset)) return;
+  ORDER = [];
+  TYPES = {};
+  currentType = null;
+  saveState();
+  renderHome();
+  renderAnalytics();
+  showScreen('home');
 }
 
 // ---------------------------------------------------------------
@@ -635,16 +744,16 @@ function renderAnalytics(){
     else if(stats.confidence==='high'){ pct=90; label=L().confHighShort; }
     else if(stats.confidence==='medium'){ pct=55; label=L().confMedShort; }
     else { pct=30; label=L().confPrelimShort; }
-    barsHtml += '<div class="bar-row"><span class="bar-label">'+L().types[id]+'</span>'+
+    barsHtml += '<div class="bar-row"><span class="bar-label">'+t.name+'</span>'+
       '<span class="bar-track"><span class="bar-fill" style="width:'+pct+'%"></span></span>'+
       '<span class="bar-val">'+label+'</span></div>';
 
     const trendText = stats.status==='cold' ? L().needData : trendLabel(stats.trend);
     const trendCls = stats.status==='cold' ? 'status-cold' : 'status-ok';
-    rowsHtml += '<tr onclick="openDetail(\''+id+'\')"><td>'+L().types[id]+'</td><td>'+t.records.length+'</td>'+
+    rowsHtml += '<tr onclick="openDetail(\''+id+'\')"><td>'+t.name+'</td><td>'+t.records.length+'</td>'+
       '<td class="'+trendCls+'">'+trendText+'</td></tr>';
   });
-  const highConfPct = Math.round(highConf/ORDER.length*100);
+  const highConfPct = ORDER.length ? Math.round(highConf/ORDER.length*100) : 0;
   document.getElementById('analytics-summary').innerHTML =
     '<tr><td>'+L().metricTotalEvents+'</td><td>'+totalRecords+'</td></tr>'+
     '<tr><td>'+L().metricRhythms+'</td><td>'+activeRhythms+' / '+ORDER.length+'</td></tr>'+
@@ -667,8 +776,11 @@ function renderHelp(){
     helpPanel(h.homeTitle, h.homeText) +
     helpPanel(h.detailTitle, h.detailText) +
     helpPanel(h.manualTitle, h.manualText) +
+    helpPanel(h.manageTitle, h.manageText) +
     helpPanel(h.analyticsTitle, h.analyticsText) +
-    helpPanel(h.keysTitle, h.keysText);
+    helpPanel(h.keysTitle, h.keysText) +
+    helpPanel(h.resetTitle, h.resetText) +
+    '<div class="panel action danger" onclick="resetAllData()">'+h.resetBtn+'</div>';
 }
 
 // ---------------------------------------------------------------
@@ -676,14 +788,14 @@ function renderHelp(){
 // ---------------------------------------------------------------
 let modalTypeId = null;
 function refreshModalLabels(){
-  if(!modalTypeId) return;
+  if(!modalTypeId || !TYPES[modalTypeId]) return;
   const t = TYPES[modalTypeId];
-  const unit = L().units[t.unitKey];
-  document.getElementById('modal-type-name').textContent = L().types[modalTypeId].toUpperCase();
+  document.getElementById('modal-type-name').textContent = t.name.toUpperCase();
   document.getElementById('modal-value-label').textContent =
-    t.measure==='duration' ? L().modalDurationLabel(unit) : L().modalQuantityLabel(unit);
+    t.measure==='duration' ? L().modalDurationLabel(t.unit) : L().modalQuantityLabel(t.unit);
 }
 function openManualEntry(typeId){
+  if(!typeId || !TYPES[typeId]) return;
   modalTypeId = typeId;
   refreshModalLabels();
   document.getElementById('modal-date').value = fmtISO(TODAY);
@@ -715,13 +827,59 @@ function submitManualEntry(){
 }
 
 // ---------------------------------------------------------------
+// Создание своего типа события
+// ---------------------------------------------------------------
+function refreshTypeModalLabels(){
+  document.getElementById('lbl-type-modal-title').textContent = L().typeModalTitle;
+  document.getElementById('lbl-type-name').textContent = L().typeNameLabel;
+  document.getElementById('lbl-type-measure').textContent = L().typeMeasureLabel;
+  document.getElementById('opt-duration').textContent = L().optDuration;
+  document.getElementById('opt-quantity').textContent = L().optQuantity;
+  document.getElementById('lbl-type-unit').textContent = L().typeUnitLabel;
+  document.getElementById('type-unit-input').setAttribute('placeholder', L().typeUnitPlaceholder);
+  document.getElementById('btn-type-save').textContent = L().typeSave;
+  document.getElementById('btn-type-cancel').textContent = L().typeCancel;
+}
+function openNewType(){
+  refreshTypeModalLabels();
+  document.getElementById('type-name-input').value = '';
+  document.getElementById('type-measure-input').value = 'duration';
+  document.getElementById('type-unit-input').value = '';
+  document.getElementById('type-modal-error').textContent = '';
+  document.getElementById('type-modal-overlay').classList.add('open');
+}
+function closeNewType(){
+  document.getElementById('type-modal-overlay').classList.remove('open');
+}
+function submitNewType(){
+  const name = document.getElementById('type-name-input').value.trim();
+  const measure = document.getElementById('type-measure-input').value;
+  const unit = document.getElementById('type-unit-input').value.trim();
+  const errEl = document.getElementById('type-modal-error');
+  if(!name){ errEl.textContent = L().errTypeName; return; }
+  if(!unit){ errEl.textContent = L().errTypeUnit; return; }
+
+  const id = generateTypeId(name);
+  TYPES[id] = { id, name, measure, unit, records: [] };
+  ORDER.push(id);
+  saveState();
+  closeNewType();
+  renderHome();
+  renderAnalytics();
+  openDetail(id);
+}
+
+// ---------------------------------------------------------------
 // Навигация по экранам и локализация статических подписей
 // ---------------------------------------------------------------
 function titleForScreen(name){
   if(name==='home') return L().titleHome;
   if(name==='analytics') return L().titleAnalytics;
   if(name==='help') return L().titleHelp;
-  if(name==='detail') return L().titleDetailPrefix + L().types[currentType].toUpperCase();
+  if(name==='detail'){
+    const t = TYPES[currentType];
+    return L().titleDetailPrefix + (t ? t.name.toUpperCase() : '');
+  }
   return '';
 }
 function activeScreenName(){
@@ -747,7 +905,6 @@ function applyStaticLabels(){
   document.getElementById('html-root').setAttribute('lang', lang);
 
   document.getElementById('lbl-kicker-home').textContent = t.kickerHome;
-  document.getElementById('lbl-cycles').textContent = t.yourCycles;
   document.getElementById('th-num').textContent = t.thNum;
   document.getElementById('th-event').textContent = t.thEvent;
   document.getElementById('th-status').textContent = t.thStatus;
@@ -788,7 +945,9 @@ function applyStaticLabels(){
   document.getElementById('lbl-f9').textContent = t.f9;
   document.getElementById('lbl-f10').textContent = t.f10;
 
-  document.getElementById('lbl-caption').textContent = t.caption;
+  document.getElementById('lbl-new-type-btn').textContent = t.newTypeBtn;
+  document.getElementById('lbl-delete-type').textContent = t.deleteType;
+  refreshTypeModalLabels();
 }
 
 function applyLang(){
@@ -812,6 +971,7 @@ function toggleLang(){
 let calBase = new Date(2026,7,1);
 
 function isEventDay(y,m,d){
+  if(!currentType || !TYPES[currentType]) return false;
   const key = y+'-'+pad2(m+1)+'-'+pad2(d);
   return TYPES[currentType].records.some(r=>r.date===key);
 }
@@ -857,10 +1017,11 @@ function calToday(){ calBase = new Date(2026,7,1); renderCalendars(); }
 // ---------------------------------------------------------------
 loadLang();
 loadState();
+if(!TYPES[currentType]) currentType = ORDER.length ? ORDER[0] : null;
 applyStaticLabels();
 renderHelp();
 renderHome();
-renderDetail();
+if(currentType) renderDetail();
 document.getElementById('titlebar').textContent = titleForScreen('home');
 </script>
 </body>
