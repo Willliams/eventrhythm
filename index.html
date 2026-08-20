@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventRhythm — Ритм событий</title>
+<style>
+  :root{
+    --bg:#000000;
+    --fg:#33FF66;
+    --fg-dim:#1F9944;
+    --sel-bg:#33FF66;
+    --sel-text:#000000;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#000000;
+    font-family:"Consolas","Lucida Console","Courier New",monospace;
+    display:flex; flex-direction:column; align-items:center; padding:36px 14px;
+  }
+  .phone{
+    width:340px; background:#0A0A0A; border-radius:34px; padding:14px 10px;
+    box-shadow:0 0 0 2px #2A2A2A, 0 20px 50px rgba(0,0,0,.6);
+  }
+  .notch{
+    width:90px; height:16px; background:#0A0A0A; border-radius:0 0 10px 10px;
+    margin:0 auto 8px; box-shadow:0 0 0 2px #2A2A2A;
+  }
+  .crt{
+    width:100%; background:var(--bg); color:var(--fg);
+    padding:0; font-size:12.5px; line-height:1.5;
+    border-top:4px double var(--fg-dim); border-bottom:4px double var(--fg-dim);
+  }
+  .titlebar{
+    color:var(--fg); font-weight:bold; text-align:center;
+    padding:5px 4px; letter-spacing:1px; border-bottom:1px solid var(--fg-dim); font-size:11px;
+  }
+  .inner{padding:8px 12px 8px;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .kicker{color:var(--fg-dim); font-weight:bold;}
+  .h-title{color:var(--fg); font-weight:bold; margin:2px 0 10px; display:flex; align-items:center; gap:10px;}
+  .h-title .back{cursor:pointer; text-decoration:underline;}
+
+  .twrap{overflow-x:auto; margin-bottom:10px;}
+  table{border-collapse:collapse; width:100%; margin-bottom:0;}
+  th,td{border:1px solid var(--fg-dim); padding:4px 5px; text-align:left; font-size:11px; white-space:nowrap;}
+  th{color:var(--fg-dim); font-weight:bold; text-transform:uppercase; letter-spacing:.5px;}
+  tr{cursor:pointer;}
+  tr.sel td{background:var(--sel-bg); color:var(--sel-text); font-weight:bold;}
+  .status-ok{color:var(--fg);}
+  .status-cold{color:var(--fg-dim);}
+  .status-now{color:var(--fg); font-weight:bold; text-decoration:underline;}
+  .btn-cell{text-align:center; color:var(--fg);}
+
+  .st-cell{display:flex; align-items:center; gap:4px;}
+  .segbar{display:inline-flex; gap:1px; flex-shrink:0;}
+  .seg{width:6px; height:11px; border:1px solid var(--fg-dim); background:transparent;}
+  .seg.on{background:var(--fg); border-color:var(--fg);}
+  .seg.on.due{animation:blink 1s steps(1) infinite;}
+  .seg.unk{border-style:dashed; border-color:var(--fg-dim);}
+  .st-txt{white-space:nowrap;}
+
+  .panel{
+    border:1px solid var(--fg-dim); padding:8px 12px; margin-bottom:10px; color:var(--fg-dim);
+  }
+  .panel .k{color:var(--fg); font-weight:bold;}
+  .panel.hero{border-style:double; border-width:3px; padding:10px 14px;}
+  .panel.hero .big{color:var(--fg); font-weight:bold; font-size:16px; margin:4px 0;}
+  .bar-row{display:flex; align-items:center; gap:6px; margin:3px 0; font-size:11px;}
+  .bar-track{flex:1; height:9px; border:1px solid var(--fg-dim); position:relative;}
+  .bar-fill{position:absolute; top:0; left:0; bottom:0; background:var(--fg);}
+  .bar-label{width:78px; color:var(--fg-dim); flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .bar-val{width:28px; text-align:right; color:var(--fg); flex-shrink:0;}
+
+  .cal-nav{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:11px;}
+  .cal-nav-btn{color:var(--fg); cursor:pointer; text-decoration:underline;}
+  .calgrid{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; justify-content:center;}
+  .cal h4{color:var(--fg); font-size:10px; font-weight:bold; margin:0 0 5px; letter-spacing:.5px;}
+  .cal table{width:auto; margin-bottom:0;}
+  .cal th, .cal td{
+    width:18px; height:17px; text-align:center; padding:0; font-size:9.5px;
+    border:1px solid var(--fg-dim); color:var(--fg-dim);
+  }
+  .cal th{color:var(--fg-dim); text-transform:none; font-weight:normal;}
+  .cal td.empty{border-color:transparent;}
+  .cal td.event{background:var(--fg); color:#000; font-weight:bold; border-color:var(--fg);}
+  .cal td.predict{color:var(--fg); font-weight:bold; border:1px dashed var(--fg);}
+  .cal-legend{font-size:10px; color:var(--fg-dim); margin-bottom:10px; text-align:center;}
+  .cal-legend .sw{display:inline-block; width:10px; height:10px; vertical-align:-1px; margin-right:4px;}
+  .cal-legend .sw.ev{background:var(--fg);}
+  .cal-legend .sw.pr{border:1px dashed var(--fg);}
+
+  .footer{
+    border-top:1px solid var(--fg-dim); color:var(--fg-dim); display:flex; font-size:10px; font-weight:bold;
+    padding:5px 4px; gap:4px 10px; flex-wrap:wrap; justify-content:center;
+  }
+  .fkey{color:var(--fg); cursor:pointer;}
+  .footer span{cursor:pointer;}
+  .cursor{
+    display:inline-block; width:9px; height:15px; background:var(--fg);
+    animation:blink 1s steps(1) infinite; vertical-align:middle; margin-left:2px;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  .caption{color:#777; font-size:12.5px; text-align:center; max-width:340px; margin:14px auto 0; line-height:1.5;}
+</style>
+</head>
+<body>
+<div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="crt">
+    <div class="titlebar" id="titlebar">EVENTRHYTHM v1.0 — РИТМ СОБЫТИЙ</div>
+    <div class="inner">
+
+      <div id="screen-home" class="screen active">
+        <div class="kicker">РИТМ СОБЫТИЙ</div>
+        <div class="h-title">Ваши циклы<span class="cursor"></span></div>
+
+        <div class="twrap">
+        <table>
+          <tr><th>№</th><th>Событие</th><th>Статус</th><th>Упр.</th></tr>
+          <tr class="sel" onclick="openDetail()">
+            <td>01</td><td>Стрижка</td>
+            <td class="status-ok"><span class="st-cell">
+              <span class="segbar"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span></span>
+              <span class="st-txt">2дн</span>
+            </span></td>
+            <td class="btn-cell">[▶]</td>
+          </tr>
+          <tr onclick="openDetail()">
+            <td>02</td><td>Заправка</td>
+            <td class="status-ok"><span class="st-cell">
+              <span class="segbar"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span></span>
+              <span class="st-txt">7дн</span>
+            </span></td>
+            <td class="btn-cell">[+]</td>
+          </tr>
+          <tr onclick="openDetail()">
+            <td>03</td><td>Аврора</td>
+            <td class="status-now"><span class="st-cell">
+              <span class="segbar"><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span></span>
+              <span class="st-txt">ПОРА</span>
+            </span></td>
+            <td class="btn-cell">[▶]</td>
+          </tr>
+          <tr onclick="openDetail()">
+            <td>04</td><td>Полив</td>
+            <td class="status-cold"><span class="st-cell">
+              <span class="segbar"><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span></span>
+              <span class="st-txt">1/2</span>
+            </span></td>
+            <td class="btn-cell">[+]</td>
+          </tr>
+        </table>
+        </div>
+        <div class="cal-legend"><span class="seg on" style="display:inline-block; vertical-align:-1px;"></span> прошло &nbsp; <span class="seg" style="display:inline-block; vertical-align:-1px;"></span> осталось &nbsp; <span class="seg unk" style="display:inline-block; vertical-align:-1px;"></span> мало данных</div>
+
+        <div class="panel">
+          <span class="k">СВОДКА:</span> событий всего 21 &nbsp; активных ритмов 3 &nbsp; высокая увер. 67%
+        </div>
+      </div>
+
+      <div id="screen-detail" class="screen">
+        <div class="h-title"><span class="back" onclick="showScreen('home')">[ESC] &lt;</span> Стрижка</div>
+
+        <div class="panel hero">
+          <div class="kicker">ПРОГНОЗ</div>
+          <div class="big">1–5 сентября (через ~2 дня)</div>
+          <div>ожидаемая длительность: ~48 мин</div>
+          <div>уверенность: <b style="color:var(--fg)">высокая</b> · 5 событий</div>
+        </div>
+
+        <div class="panel">
+          тренд: стабильно — интервал ~21 день без изменений
+        </div>
+
+        <div class="kicker" style="margin-top:2px;">СОБЫТИЯ НА КАЛЕНДАРЕ</div>
+        <div class="cal-nav">
+          <span class="cal-nav-btn" onclick="calPrev()">◀ Назад</span>
+          <span class="cal-nav-btn" onclick="calToday()">Сегодня</span>
+          <span class="cal-nav-btn" onclick="calNext()">Вперёд ▶</span>
+        </div>
+        <div class="twrap"><div class="calgrid">
+          <div class="cal">
+            <h4 id="cal-left-title">АВГУСТ 2026</h4>
+            <table><tbody id="cal-left-table"></tbody></table>
+          </div>
+          <div class="cal">
+            <h4 id="cal-right-title">СЕНТЯБРЬ 2026</h4>
+            <table><tbody id="cal-right-table"></tbody></table>
+          </div>
+        </div></div>
+        <div class="cal-legend"><span class="sw ev"></span>прошедшее событие &nbsp;&nbsp; <span class="sw pr"></span>прогнозное окно</div>
+
+        <div class="panel">
+          последние 5: 48 · 49 · 47 · 50 · 46 мин — интервал ~21 день
+        </div>
+
+        <div class="panel" style="text-align:center;">[ ▶ ПУСК ]</div>
+      </div>
+
+      <div id="screen-analytics" class="screen">
+        <div class="kicker">АНАЛИТИКА</div>
+        <div class="h-title">Общая картина</div>
+
+        <div class="twrap">
+        <table>
+          <tr><th>Метрика</th><th>Значение</th></tr>
+          <tr><td>Событий всего</td><td>21</td></tr>
+          <tr><td>Ритмов с прогнозом</td><td>3 из 4</td></tr>
+          <tr><td>Выс. уверенность</td><td>67%</td></tr>
+        </table>
+        </div>
+
+        <div class="kicker" style="margin-top:6px;">УВЕРЕННОСТЬ ПО ЦИКЛАМ</div>
+        <div class="bar-row"><span class="bar-label">Стрижка</span><span class="bar-track"><span class="bar-fill" style="width:90%"></span></span><span class="bar-val">выс.</span></div>
+        <div class="bar-row"><span class="bar-label">Заправка</span><span class="bar-track"><span class="bar-fill" style="width:90%"></span></span><span class="bar-val">выс.</span></div>
+        <div class="bar-row"><span class="bar-label">Аврора</span><span class="bar-track"><span class="bar-fill" style="width:55%"></span></span><span class="bar-val">сред.</span></div>
+        <div class="bar-row"><span class="bar-label">Полив</span><span class="bar-track"><span class="bar-fill" style="width:15%"></span></span><span class="bar-val">нет</span></div>
+
+        <div class="twrap">
+        <table style="margin-top:10px;">
+          <tr><th>Событие</th><th>Зап.</th><th>Тренд</th></tr>
+          <tr onclick="openDetail()"><td>Стрижка</td><td>5</td><td class="status-ok">стабильно</td></tr>
+          <tr><td>Заправка</td><td>5</td><td class="status-ok">стабильно</td></tr>
+          <tr><td>Аврора</td><td>6</td><td class="status-ok">стабильно</td></tr>
+          <tr><td>Полив</td><td>1</td><td class="status-cold">нужно данных</td></tr>
+        </table>
+        </div>
+      </div>
+
+    </div>
+    <div class="footer">
+      <span><span class="fkey">F1</span> Помощь</span>
+      <span><span class="fkey">F2</span> Пуск</span>
+      <span><span class="fkey">F3</span> Стоп</span>
+      <span onclick="openDetail()"><span class="fkey">F4</span> Детали</span>
+      <span><span class="fkey">F5</span> Новый тип</span>
+      <span onclick="showScreen('analytics')"><span class="fkey">F9</span> Аналитика</span>
+      <span onclick="showScreen('home')"><span class="fkey">F10</span> Главная</span>
+    </div>
+    </div>
+  </div>
+  <p class="caption">Вид как на экране телефона — в рамке 340px. Три экрана в едином стиле: главная, детали, аналитика. Кликайте по строкам таблиц или F4 / F9 / F10 внизу.</p>
+</div>
+
+<script>
+const TITLES = {
+  home: 'EVENTRHYTHM v1.0 — РИТМ СОБЫТИЙ',
+  detail: 'EVENTRHYTHM v1.0 — СТРИЖКА',
+  analytics: 'EVENTRHYTHM v1.0 — АНАЛИТИКА'
+};
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('titlebar').textContent = TITLES[name];
+}
+function openDetail(){ showScreen('detail'); }
+
+// ---- календарь: прокрутка вперёд/назад ----
+const MONTH_NAMES = ['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','ИЮНЬ','ИЮЛЬ','АВГУСТ','СЕНТЯБРЬ','ОКТЯБРЬ','НОЯБРЬ','ДЕКАБРЬ'];
+const EVENT_DATES = new Set(['2026-05-20','2026-06-10','2026-07-01','2026-07-22','2026-08-12']);
+const PREDICT_START = new Date(2026,8,1);
+const PREDICT_END = new Date(2026,8,5);
+let calBase = new Date(2026,7,1); // левый календарь начинается с августа 2026
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function isEventDay(y,m,d){ return EVENT_DATES.has(y+'-'+pad2(m+1)+'-'+pad2(d)); }
+function isPredictDay(y,m,d){ const dt=new Date(y,m,d); return dt>=PREDICT_START && dt<=PREDICT_END; }
+
+function buildMonthRows(y,m){
+  let dow = new Date(y,m,1).getDay(); // 0=Вс..6=Сб
+  dow = (dow+6)%7; // переводим на Пн=0
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const cells=[];
+  for(let i=0;i<dow;i++) cells.push('<td class="empty"></td>');
+  for(let d=1; d<=daysInMonth; d++){
+    let cls='';
+    if(isEventDay(y,m,d)) cls=' class="event"';
+    else if(isPredictDay(y,m,d)) cls=' class="predict"';
+    cells.push('<td'+cls+'>'+d+'</td>');
+  }
+  while(cells.length % 7 !== 0) cells.push('<td class="empty"></td>');
+  let html='<tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>';
+  for(let i=0;i<cells.length;i+=7){ html += '<tr>'+cells.slice(i,i+7).join('')+'</tr>'; }
+  return html;
+}
+
+function renderCalendars(){
+  const y1=calBase.getFullYear(), m1=calBase.getMonth();
+  const right=new Date(y1,m1+1,1);
+  const y2=right.getFullYear(), m2=right.getMonth();
+  document.getElementById('cal-left-title').textContent = MONTH_NAMES[m1]+' '+y1;
+  document.getElementById('cal-left-table').innerHTML = buildMonthRows(y1,m1);
+  document.getElementById('cal-right-title').textContent = MONTH_NAMES[m2]+' '+y2;
+  document.getElementById('cal-right-table').innerHTML = buildMonthRows(y2,m2);
+}
+function calPrev(){ calBase = new Date(calBase.getFullYear(), calBase.getMonth()-1, 1); renderCalendars(); }
+function calNext(){ calBase = new Date(calBase.getFullYear(), calBase.getMonth()+1, 1); renderCalendars(); }
+function calToday(){ calBase = new Date(2026,7,1); renderCalendars(); }
+
+renderCalendars();
+</script>
+</body>
+</html>
