@@ -61,7 +61,7 @@
 
   .st-cell{display:flex; align-items:center; gap:4px;}
   .segbar{display:inline-flex; gap:1px; flex-shrink:0;}
-  .seg{width:6px; height:11px; border:1px solid var(--fg-dim); background:transparent;}
+  .seg{width:4px; height:11px; border:1px solid var(--fg-dim); background:transparent;}
   .seg.on{background:var(--fg); border-color:var(--fg);}
   .seg.on.due{animation:blink 1s steps(1) infinite;}
   .seg.unk{border-style:dashed; border-color:var(--fg-dim);}
@@ -282,7 +282,7 @@
       <span onclick="toggleLang()"><span class="fkey">F8</span> <span id="lbl-f8">English</span></span>
       <span onclick="showScreen('analytics')"><span class="fkey">F9</span> <span id="lbl-f9">Аналитика</span></span>
       <span onclick="showScreen('home')"><span class="fkey">F10</span> <span id="lbl-f10">Главная</span></span>
-      <span style="cursor:default; color:#555; font-weight:normal;" id="build-tag">build 6</span>
+      <span style="cursor:default; color:#555; font-weight:normal;" id="build-tag">build 7</span>
     </div>
     </div>
   </div>
@@ -596,7 +596,7 @@ function confLabel(key){
 // Главная: таблица циклов
 // ---------------------------------------------------------------
 function segBarHtml(stats){
-  const N = 6;
+  const N = 10;
   let cells = '';
   if(stats.status==='cold'){
     for(let i=0;i<N;i++) cells += '<span class="seg unk"></span>';
