@@ -31,6 +31,7 @@
     width:100%; background:var(--bg); color:var(--fg);
     padding:0; font-size:12.5px; line-height:1.5;
     border-top:4px double var(--fg-dim); border-bottom:4px double var(--fg-dim);
+    position:relative;
   }
   .titlebar{
     color:var(--fg); font-weight:bold; text-align:center;
@@ -53,6 +54,7 @@
   .status-cold{color:var(--fg-dim);}
   .status-now{color:var(--fg); font-weight:bold; text-decoration:underline;}
   .btn-cell{text-align:center; color:var(--fg);}
+  .btn-cell span.act{cursor:pointer;}
 
   .st-cell{display:flex; align-items:center; gap:4px;}
   .segbar{display:inline-flex; gap:1px; flex-shrink:0;}
@@ -68,6 +70,7 @@
   .panel .k{color:var(--fg); font-weight:bold;}
   .panel.hero{border-style:double; border-width:3px; padding:10px 14px;}
   .panel.hero .big{color:var(--fg); font-weight:bold; font-size:16px; margin:4px 0;}
+  .panel.action{text-align:center; cursor:pointer; color:var(--fg); font-weight:bold;}
   .bar-row{display:flex; align-items:center; gap:6px; margin:3px 0; font-size:11px;}
   .bar-track{flex:1; height:9px; border:1px solid var(--fg-dim); position:relative;}
   .bar-fill{position:absolute; top:0; left:0; bottom:0; background:var(--fg);}
@@ -104,6 +107,22 @@
   }
   @keyframes blink{50%{opacity:0;}}
   .caption{color:#777; font-size:12.5px; text-align:center; max-width:340px; margin:14px auto 0; line-height:1.5;}
+
+  .modal-overlay{
+    display:none; position:absolute; inset:0; background:rgba(0,0,0,.9);
+    align-items:center; justify-content:center; padding:16px; z-index:10;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{width:100%;}
+  .modal-field{margin:8px 0 0; display:flex; flex-direction:column; gap:3px;}
+  .modal-field label{color:var(--fg-dim); font-size:10px; text-transform:uppercase; letter-spacing:.5px;}
+  .modal-field input{
+    background:#000; border:1px solid var(--fg-dim); color:var(--fg);
+    font-family:inherit; font-size:12px; padding:5px 6px; color-scheme:dark; width:100%;
+  }
+  .modal-field input:focus{outline:1px solid var(--fg);}
+  .modal-actions{display:flex; gap:18px; margin-top:12px; justify-content:center;}
+  .modal-error{color:var(--fg); font-weight:bold; font-size:10.5px; margin-top:6px; min-height:12px;}
 </style>
 </head>
 <body>
@@ -120,61 +139,21 @@
 
         <div class="twrap">
         <table>
-          <tr><th>№</th><th>Событие</th><th>Статус</th><th>Упр.</th></tr>
-          <tr class="sel" onclick="openDetail()">
-            <td>01</td><td>Стрижка</td>
-            <td class="status-ok"><span class="st-cell">
-              <span class="segbar"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span></span>
-              <span class="st-txt">2дн</span>
-            </span></td>
-            <td class="btn-cell">[▶]</td>
-          </tr>
-          <tr onclick="openDetail()">
-            <td>02</td><td>Заправка</td>
-            <td class="status-ok"><span class="st-cell">
-              <span class="segbar"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span><span class="seg"></span><span class="seg"></span></span>
-              <span class="st-txt">7дн</span>
-            </span></td>
-            <td class="btn-cell">[+]</td>
-          </tr>
-          <tr onclick="openDetail()">
-            <td>03</td><td>Аврора</td>
-            <td class="status-now"><span class="st-cell">
-              <span class="segbar"><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span><span class="seg on due"></span></span>
-              <span class="st-txt">ПОРА</span>
-            </span></td>
-            <td class="btn-cell">[▶]</td>
-          </tr>
-          <tr onclick="openDetail()">
-            <td>04</td><td>Полив</td>
-            <td class="status-cold"><span class="st-cell">
-              <span class="segbar"><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span><span class="seg unk"></span></span>
-              <span class="st-txt">1/2</span>
-            </span></td>
-            <td class="btn-cell">[+]</td>
-          </tr>
+          <thead><tr><th>№</th><th>Событие</th><th>Статус</th><th>Упр.</th></tr></thead>
+          <tbody id="home-rows"></tbody>
         </table>
         </div>
         <div class="cal-legend"><span class="seg on" style="display:inline-block; vertical-align:-1px;"></span> прошло &nbsp; <span class="seg" style="display:inline-block; vertical-align:-1px;"></span> осталось &nbsp; <span class="seg unk" style="display:inline-block; vertical-align:-1px;"></span> мало данных</div>
 
-        <div class="panel">
-          <span class="k">СВОДКА:</span> событий всего 21 &nbsp; активных ритмов 3 &nbsp; высокая увер. 67%
-        </div>
+        <div class="panel" id="home-summary"></div>
       </div>
 
       <div id="screen-detail" class="screen">
-        <div class="h-title"><span class="back" onclick="showScreen('home')">[ESC] &lt;</span> Стрижка</div>
+        <div class="h-title"><span class="back" onclick="showScreen('home')">[ESC] &lt;</span> <span id="detail-name"></span></div>
 
-        <div class="panel hero">
-          <div class="kicker">ПРОГНОЗ</div>
-          <div class="big">1–5 сентября (через ~2 дня)</div>
-          <div>ожидаемая длительность: ~48 мин</div>
-          <div>уверенность: <b style="color:var(--fg)">высокая</b> · 5 событий</div>
-        </div>
+        <div class="panel hero" id="detail-hero"></div>
 
-        <div class="panel">
-          тренд: стабильно — интервал ~21 день без изменений
-        </div>
+        <div class="panel" id="detail-trend"></div>
 
         <div class="kicker" style="margin-top:2px;">СОБЫТИЯ НА КАЛЕНДАРЕ</div>
         <div class="cal-nav">
@@ -194,11 +173,9 @@
         </div></div>
         <div class="cal-legend"><span class="sw ev"></span>прошедшее событие &nbsp;&nbsp; <span class="sw pr"></span>прогнозное окно</div>
 
-        <div class="panel">
-          последние 5: 48 · 49 · 47 · 50 · 46 мин — интервал ~21 день
-        </div>
+        <div class="panel" id="detail-last"></div>
 
-        <div class="panel" style="text-align:center;">[ ▶ ПУСК ]</div>
+        <div class="panel action" onclick="openManualEntry(currentType)">[ + Ввести вручную ]</div>
       </div>
 
       <div id="screen-analytics" class="screen">
@@ -207,35 +184,81 @@
 
         <div class="twrap">
         <table>
-          <tr><th>Метрика</th><th>Значение</th></tr>
-          <tr><td>Событий всего</td><td>21</td></tr>
-          <tr><td>Ритмов с прогнозом</td><td>3 из 4</td></tr>
-          <tr><td>Выс. уверенность</td><td>67%</td></tr>
+          <thead><tr><th>Метрика</th><th>Значение</th></tr></thead>
+          <tbody id="analytics-summary"></tbody>
         </table>
         </div>
 
         <div class="kicker" style="margin-top:6px;">УВЕРЕННОСТЬ ПО ЦИКЛАМ</div>
-        <div class="bar-row"><span class="bar-label">Стрижка</span><span class="bar-track"><span class="bar-fill" style="width:90%"></span></span><span class="bar-val">выс.</span></div>
-        <div class="bar-row"><span class="bar-label">Заправка</span><span class="bar-track"><span class="bar-fill" style="width:90%"></span></span><span class="bar-val">выс.</span></div>
-        <div class="bar-row"><span class="bar-label">Аврора</span><span class="bar-track"><span class="bar-fill" style="width:55%"></span></span><span class="bar-val">сред.</span></div>
-        <div class="bar-row"><span class="bar-label">Полив</span><span class="bar-track"><span class="bar-fill" style="width:15%"></span></span><span class="bar-val">нет</span></div>
+        <div id="analytics-bars"></div>
 
         <div class="twrap">
         <table style="margin-top:10px;">
-          <tr><th>Событие</th><th>Зап.</th><th>Тренд</th></tr>
-          <tr onclick="openDetail()"><td>Стрижка</td><td>5</td><td class="status-ok">стабильно</td></tr>
-          <tr><td>Заправка</td><td>5</td><td class="status-ok">стабильно</td></tr>
-          <tr><td>Аврора</td><td>6</td><td class="status-ok">стабильно</td></tr>
-          <tr><td>Полив</td><td>1</td><td class="status-cold">нужно данных</td></tr>
+          <thead><tr><th>Событие</th><th>Зап.</th><th>Тренд</th></tr></thead>
+          <tbody id="analytics-rows"></tbody>
         </table>
         </div>
       </div>
 
+      <div id="screen-help" class="screen">
+        <div class="h-title"><span class="back" onclick="showScreen('home')">[ESC] &lt;</span> Помощь</div>
+
+        <div class="panel">
+          <div class="kicker">ЧТО ЭТО</div>
+          EventRhythm следит за повторяющимися событиями (стрижка, заправка, рабочие сессии и т.п.) и предсказывает, когда наступит следующее и сколько времени или объёма оно займёт — по истории ваших записей.
+        </div>
+
+        <div class="panel">
+          <div class="kicker">ГЛАВНАЯ</div>
+          Таблица циклов. Статус — полоска из 6 клеток: залитые клетки = сколько времени уже прошло с прошлого события, пустые = сколько осталось до прогноза. Пунктир — мало данных, мигание — уже пора. Клик по строке открывает детали, [+] / [▶] — быстрая запись без перехода.
+        </div>
+
+        <div class="panel">
+          <div class="kicker">ДЕТАЛИ</div>
+          Прогноз следующей даты и значения, тренд интервала (ускоряется / стабильно / замедляется), календарь на два месяца — «◀ Назад», «Сегодня», «Вперёд ▶» листают месяцы. Залитый день — прошедшее событие, пунктирный — окно прогноза. Кнопка «+ Ввести вручную» добавляет запись для текущего события.
+        </div>
+
+        <div class="panel">
+          <div class="kicker">РУЧНОЙ ВВОД</div>
+          Укажите дату и значение (минуты, часы или литры — в зависимости от типа события). Если на эту дату уже есть запись — она будет обновлена. Данные сохраняются в браузере и не пропадают при перезагрузке страницы.
+        </div>
+
+        <div class="panel">
+          <div class="kicker">АНАЛИТИКА</div>
+          Сводные цифры по всем циклам, уверенность прогноза (зависит от числа записей и стабильности интервалов между ними) и тренд по каждому событию.
+        </div>
+
+        <div class="panel">
+          <div class="kicker">ГОРЯЧИЕ КЛАВИШИ</div>
+          F1 Помощь &nbsp; F2 Новая запись &nbsp; F3 Отмена / на главную &nbsp; F4 Детали текущего события &nbsp; F9 Аналитика &nbsp; F10 Главная
+        </div>
+      </div>
+
     </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal panel hero">
+        <div class="kicker">НОВАЯ ЗАПИСЬ — <span id="modal-type-name"></span></div>
+        <div class="modal-field">
+          <label>Дата</label>
+          <input type="date" id="modal-date">
+        </div>
+        <div class="modal-field">
+          <label id="modal-value-label">Значение</label>
+          <input type="number" id="modal-value" step="0.1" min="0" inputmode="decimal">
+        </div>
+        <div class="modal-actions">
+          <span class="cal-nav-btn" onclick="submitManualEntry()">[ Сохранить ]</span>
+          <span class="cal-nav-btn" onclick="closeManualEntry()">[ Отмена ]</span>
+        </div>
+        <div class="modal-error" id="modal-error"></div>
+      </div>
+    </div>
+
     <div class="footer">
-      <span><span class="fkey">F1</span> Помощь</span>
-      <span><span class="fkey">F2</span> Пуск</span>
-      <span><span class="fkey">F3</span> Стоп</span>
+      <span onclick="showScreen('help')"><span class="fkey">F1</span> Помощь</span>
+      <span onclick="openManualEntry(currentType)"><span class="fkey">F2</span> Запись</span>
+      <span onclick="showScreen('home')"><span class="fkey">F3</span> Отмена</span>
       <span onclick="openDetail()"><span class="fkey">F4</span> Детали</span>
       <span><span class="fkey">F5</span> Новый тип</span>
       <span onclick="showScreen('analytics')"><span class="fkey">F9</span> Аналитика</span>
@@ -243,36 +266,329 @@
     </div>
     </div>
   </div>
-  <p class="caption">Вид как на экране телефона — в рамке 340px. Три экрана в едином стиле: главная, детали, аналитика. Кликайте по строкам таблиц или F4 / F9 / F10 внизу.</p>
+  <p class="caption">Вид как на экране телефона — в рамке 340px. Данные можно вносить вручную (кнопка «+ Ввести вручную» или F2) — прогноз и календарь пересчитываются сразу и сохраняются в браузере.</p>
 </div>
 
 <script>
+// ---------------------------------------------------------------
+// Данные: типы событий и их записи (дата + значение)
+// ---------------------------------------------------------------
+const TODAY = new Date(2026,7,20); // 20 августа 2026 — фиксированное "сегодня" для демо
+const ORDER = ['haircut','fuel','aurora','water'];
+const TYPES = {
+  haircut: { id:'haircut', name:'Стрижка',  measure:'duration', unit:'мин', records:[
+    {date:'2026-05-09', value:47}, {date:'2026-05-30', value:49}, {date:'2026-06-20', value:46},
+    {date:'2026-07-11', value:50}, {date:'2026-08-01', value:48}
+  ]},
+  fuel: { id:'fuel', name:'Заправка', measure:'quantity', unit:'л', records:[
+    {date:'2026-03-30', value:43}, {date:'2026-04-29', value:45}, {date:'2026-05-29', value:44},
+    {date:'2026-06-28', value:46}, {date:'2026-07-28', value:44}
+  ]},
+  aurora: { id:'aurora', name:'Аврора', measure:'duration', unit:'ч', records:[
+    {date:'2026-05-25', value:3.0}, {date:'2026-06-08', value:3.5}, {date:'2026-06-22', value:2.8},
+    {date:'2026-07-06', value:4.0}, {date:'2026-07-20', value:3.2}, {date:'2026-08-03', value:3.6}
+  ]},
+  water: { id:'water', name:'Полив', measure:'quantity', unit:'л', records:[
+    {date:'2026-08-15', value:2}
+  ]}
+};
+
+const STORAGE_KEY = 'eventrhythm_pg_v1';
+function saveState(){
+  try{
+    const data = {};
+    ORDER.forEach(id => { data[id] = TYPES[id].records; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }catch(e){ /* localStorage недоступен — просто не сохраняем */ }
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    ORDER.forEach(id => { if(Array.isArray(data[id])) TYPES[id].records = data[id]; });
+  }catch(e){ /* игнорируем повреждённые данные */ }
+}
+
+// ---------------------------------------------------------------
+// Вычисление прогноза по записям типа события
+// ---------------------------------------------------------------
+function pad2(n){ return String(n).padStart(2,'0'); }
+function fmtISO(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function daysBetween(d1,d2){ return Math.round((d2-d1)/86400000); }
+function ruDays(n){
+  n = Math.abs(Math.round(n));
+  const n10=n%10, n100=n%100;
+  if(n100>=11 && n100<=14) return 'дней';
+  if(n10===1) return 'день';
+  if(n10>=2 && n10<=4) return 'дня';
+  return 'дней';
+}
+const MONTH_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+function formatRange(d1,d2){
+  const a=d1.getDate(), b=d2.getDate(), ma=d1.getMonth(), mb=d2.getMonth();
+  if(ma===mb) return a===b ? (a+' '+MONTH_GEN[ma]) : (a+'–'+b+' '+MONTH_GEN[ma]);
+  return a+' '+MONTH_GEN[ma]+' – '+b+' '+MONTH_GEN[mb];
+}
+
+function computeStats(t){
+  const recs = t.records.slice().sort((a,b)=> a.date.localeCompare(b.date));
+  if(recs.length < 2) return { status:'cold', count:recs.length, recs };
+
+  const last5 = recs.slice(-5);
+  const intervals = [];
+  for(let i=1;i<last5.length;i++) intervals.push(daysBetween(new Date(last5[i-1].date), new Date(last5[i].date)));
+  const avgInterval = intervals.reduce((a,b)=>a+b,0)/intervals.length;
+  const values = last5.map(r=>r.value);
+  const avgValue = values.reduce((a,b)=>a+b,0)/values.length;
+  const variance = intervals.reduce((s,x)=>s+Math.pow(x-avgInterval,2),0)/intervals.length;
+  const stdDev = Math.sqrt(variance);
+  const cv = avgInterval>0 ? stdDev/avgInterval : 1;
+
+  const lastDate = new Date(recs[recs.length-1].date);
+  const nextDate = new Date(lastDate); nextDate.setDate(nextDate.getDate()+Math.round(avgInterval));
+  const windowDays = Math.max(1, Math.round(stdDev));
+  const windowEnd = new Date(nextDate); windowEnd.setDate(windowEnd.getDate()+windowDays-1);
+  const daysUntil = daysBetween(TODAY, nextDate);
+
+  let confidence;
+  if(recs.length>=4 && cv<0.15) confidence='высокая';
+  else if(recs.length>=3 && cv<0.35) confidence='средняя';
+  else confidence='предварительная';
+
+  let trend='стабильно';
+  if(intervals.length>=2){
+    const lastGap = intervals[intervals.length-1];
+    const prevAvg = intervals.slice(0,-1).reduce((a,b)=>a+b,0)/(intervals.length-1);
+    if(lastGap < prevAvg*0.85) trend='ускоряется';
+    else if(lastGap > prevAvg*1.15) trend='замедляется';
+  }
+
+  const elapsedSinceLast = daysBetween(lastDate, TODAY);
+  const fraction = avgInterval>0 ? elapsedSinceLast/avgInterval : 1;
+
+  return {
+    status: daysUntil<=0 ? 'due' : 'ok',
+    count: recs.length, avgInterval, avgValue, confidence, trend,
+    nextDate, windowEnd, daysUntil, fraction, recs
+  };
+}
+
+// ---------------------------------------------------------------
+// Главная: таблица циклов
+// ---------------------------------------------------------------
+function segBarHtml(stats){
+  const N = 6;
+  let cells = '';
+  if(stats.status==='cold'){
+    for(let i=0;i<N;i++) cells += '<span class="seg unk"></span>';
+    return '<span class="segbar">'+cells+'</span>';
+  }
+  if(stats.status==='due'){
+    for(let i=0;i<N;i++) cells += '<span class="seg on due"></span>';
+    return '<span class="segbar">'+cells+'</span>';
+  }
+  const on = Math.max(0, Math.min(N, Math.round(stats.fraction*N)));
+  for(let i=0;i<N;i++) cells += '<span class="seg'+(i<on?' on':'')+'"></span>';
+  return '<span class="segbar">'+cells+'</span>';
+}
+function statusTextAndClass(stats){
+  if(stats.status==='cold') return { text: stats.count+'/2', cls:'status-cold' };
+  if(stats.status==='due') return { text:'ПОРА', cls:'status-now' };
+  return { text: stats.daysUntil+'дн', cls:'status-ok' };
+}
+
+function renderHome(){
+  let rows='';
+  let totalRecords=0, activeRhythms=0, highConf=0;
+  ORDER.forEach(id => {
+    const t = TYPES[id];
+    const stats = computeStats(t);
+    totalRecords += t.records.length;
+    if(stats.status!=='cold') activeRhythms++;
+    if(stats.confidence==='высокая') highConf++;
+    const st = statusTextAndClass(stats);
+    const icon = t.measure==='duration' ? '▶' : '+';
+    const selCls = id===currentType ? ' sel' : '';
+    rows += '<tr class="'+selCls.trim()+'" onclick="openDetail(\''+id+'\')">'+
+      '<td>'+String(ORDER.indexOf(id)+1).padStart(2,'0')+'</td><td>'+t.name+'</td>'+
+      '<td class="'+st.cls+'"><span class="st-cell">'+segBarHtml(stats)+'<span class="st-txt">'+st.text+'</span></span></td>'+
+      '<td class="btn-cell"><span class="act" onclick="event.stopPropagation(); openManualEntry(\''+id+'\')">['+icon+']</span></td>'+
+    '</tr>';
+  });
+  document.getElementById('home-rows').innerHTML = rows;
+  const highConfPct = Math.round(highConf/ORDER.length*100);
+  document.getElementById('home-summary').innerHTML =
+    '<span class="k">СВОДКА:</span> событий всего '+totalRecords+' &nbsp; активных ритмов '+activeRhythms+' &nbsp; высокая увер. '+highConfPct+'%';
+}
+
+// ---------------------------------------------------------------
+// Детали события
+// ---------------------------------------------------------------
+let currentType = 'haircut';
+let currentStats = null;
+
+function renderDetail(){
+  const t = TYPES[currentType];
+  currentStats = computeStats(t);
+  document.getElementById('detail-name').textContent = t.name;
+  document.getElementById('titlebar').textContent = 'EVENTRHYTHM v1.0 — '+t.name.toUpperCase();
+
+  const hero = document.getElementById('detail-hero');
+  const trendEl = document.getElementById('detail-trend');
+  const lastEl = document.getElementById('detail-last');
+
+  if(currentStats.status==='cold'){
+    hero.innerHTML =
+      '<div class="kicker">ПРОГНОЗ</div>'+
+      '<div class="big">недостаточно данных</div>'+
+      '<div>записано '+currentStats.count+' из 2 — добавьте ещё, чтобы увидеть прогноз</div>';
+    trendEl.innerHTML = 'тренд: недостаточно данных';
+    if(currentStats.count===0){
+      lastEl.innerHTML = 'записей пока нет';
+    }else{
+      const r = currentStats.recs[currentStats.recs.length-1];
+      lastEl.innerHTML = 'последняя запись: '+r.date+' — '+r.value+' '+t.unit;
+    }
+  }else{
+    const rangeText = formatRange(currentStats.nextDate, currentStats.windowEnd);
+    const whenText = currentStats.daysUntil<=0
+      ? 'просрочено на '+Math.abs(currentStats.daysUntil)+' '+ruDays(currentStats.daysUntil)
+      : 'через ~'+currentStats.daysUntil+' '+ruDays(currentStats.daysUntil);
+    const valLabel = t.measure==='duration' ? 'ожидаемая длительность' : 'ожидаемое количество';
+    const valNum = Math.round(currentStats.avgValue*10)/10;
+    hero.innerHTML =
+      '<div class="kicker">ПРОГНОЗ</div>'+
+      '<div class="big">'+rangeText+' ('+whenText+')</div>'+
+      '<div>'+valLabel+': ~'+valNum+' '+t.unit+'</div>'+
+      '<div>уверенность: <b style="color:var(--fg)">'+currentStats.confidence+'</b> · '+currentStats.count+' событий</div>';
+
+    trendEl.innerHTML = 'тренд: '+currentStats.trend+' — интервал ~'+Math.round(currentStats.avgInterval)+' '+ruDays(currentStats.avgInterval)+
+      (currentStats.trend==='стабильно' ? ' без изменений' : '');
+
+    const last5 = currentStats.recs.slice(-5);
+    const valuesStr = last5.map(r=>r.value).join(' · ');
+    lastEl.innerHTML = 'последние '+last5.length+': '+valuesStr+' '+t.unit+' — интервал ~'+Math.round(currentStats.avgInterval)+' '+ruDays(currentStats.avgInterval);
+  }
+
+  calBase = new Date(2026,7,1);
+  renderCalendars();
+}
+
+function openDetail(typeId){
+  if(typeId) currentType = typeId;
+  showScreen('detail');
+  renderDetail();
+}
+
+// ---------------------------------------------------------------
+// Аналитика
+// ---------------------------------------------------------------
+function renderAnalytics(){
+  let totalRecords=0, activeRhythms=0, highConf=0;
+  let barsHtml='', rowsHtml='';
+  ORDER.forEach(id=>{
+    const t = TYPES[id];
+    const stats = computeStats(t);
+    totalRecords += t.records.length;
+    if(stats.status!=='cold') activeRhythms++;
+    if(stats.confidence==='высокая') highConf++;
+
+    let pct, label;
+    if(stats.status==='cold'){ pct=10; label='нет'; }
+    else if(stats.confidence==='высокая'){ pct=90; label='выс.'; }
+    else if(stats.confidence==='средняя'){ pct=55; label='сред.'; }
+    else { pct=30; label='предв.'; }
+    barsHtml += '<div class="bar-row"><span class="bar-label">'+t.name+'</span>'+
+      '<span class="bar-track"><span class="bar-fill" style="width:'+pct+'%"></span></span>'+
+      '<span class="bar-val">'+label+'</span></div>';
+
+    const trendLabel = stats.status==='cold' ? 'нужно данных' : stats.trend;
+    const trendCls = stats.status==='cold' ? 'status-cold' : 'status-ok';
+    rowsHtml += '<tr onclick="openDetail(\''+id+'\')"><td>'+t.name+'</td><td>'+t.records.length+'</td>'+
+      '<td class="'+trendCls+'">'+trendLabel+'</td></tr>';
+  });
+  const highConfPct = Math.round(highConf/ORDER.length*100);
+  document.getElementById('analytics-summary').innerHTML =
+    '<tr><td>Событий всего</td><td>'+totalRecords+'</td></tr>'+
+    '<tr><td>Ритмов с прогнозом</td><td>'+activeRhythms+' из '+ORDER.length+'</td></tr>'+
+    '<tr><td>Выс. уверенность</td><td>'+highConfPct+'%</td></tr>';
+  document.getElementById('analytics-bars').innerHTML = barsHtml;
+  document.getElementById('analytics-rows').innerHTML = rowsHtml;
+}
+
+// ---------------------------------------------------------------
+// Ручной ввод записи
+// ---------------------------------------------------------------
+let modalTypeId = null;
+function openManualEntry(typeId){
+  modalTypeId = typeId;
+  const t = TYPES[typeId];
+  document.getElementById('modal-type-name').textContent = t.name.toUpperCase();
+  document.getElementById('modal-value-label').textContent =
+    (t.measure==='duration' ? 'Длительность (' : 'Количество (') + t.unit + ')';
+  document.getElementById('modal-date').value = fmtISO(TODAY);
+  document.getElementById('modal-value').value = '';
+  document.getElementById('modal-error').textContent = '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeManualEntry(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalTypeId = null;
+}
+function submitManualEntry(){
+  const dateStr = document.getElementById('modal-date').value;
+  const valStr = document.getElementById('modal-value').value;
+  const errEl = document.getElementById('modal-error');
+  if(!dateStr){ errEl.textContent = 'Укажите дату.'; return; }
+  const val = parseFloat(String(valStr).replace(',','.'));
+  if(!valStr || isNaN(val) || val<=0){ errEl.textContent = 'Введите значение больше нуля.'; return; }
+
+  const t = TYPES[modalTypeId];
+  const idx = t.records.findIndex(r=>r.date===dateStr);
+  if(idx>=0) t.records[idx].value = val; else t.records.push({date:dateStr, value:val});
+
+  saveState();
+  closeManualEntry();
+  renderHome();
+  renderAnalytics();
+  if(document.getElementById('screen-detail').classList.contains('active') && currentType===modalTypeId) renderDetail();
+}
+
+// ---------------------------------------------------------------
+// Навигация по экранам
+// ---------------------------------------------------------------
 const TITLES = {
   home: 'EVENTRHYTHM v1.0 — РИТМ СОБЫТИЙ',
-  detail: 'EVENTRHYTHM v1.0 — СТРИЖКА',
-  analytics: 'EVENTRHYTHM v1.0 — АНАЛИТИКА'
+  analytics: 'EVENTRHYTHM v1.0 — АНАЛИТИКА',
+  help: 'EVENTRHYTHM v1.0 — ПОМОЩЬ'
 };
 function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
-  document.getElementById('titlebar').textContent = TITLES[name];
+  if(TITLES[name]) document.getElementById('titlebar').textContent = TITLES[name];
+  if(name==='home') renderHome();
+  if(name==='analytics') renderAnalytics();
 }
-function openDetail(){ showScreen('detail'); }
 
-// ---- календарь: прокрутка вперёд/назад ----
+// ---------------------------------------------------------------
+// Календарь: прокрутка вперёд/назад
+// ---------------------------------------------------------------
 const MONTH_NAMES = ['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','ИЮНЬ','ИЮЛЬ','АВГУСТ','СЕНТЯБРЬ','ОКТЯБРЬ','НОЯБРЬ','ДЕКАБРЬ'];
-const EVENT_DATES = new Set(['2026-05-20','2026-06-10','2026-07-01','2026-07-22','2026-08-12']);
-const PREDICT_START = new Date(2026,8,1);
-const PREDICT_END = new Date(2026,8,5);
-let calBase = new Date(2026,7,1); // левый календарь начинается с августа 2026
+let calBase = new Date(2026,7,1);
 
-function pad2(n){ return String(n).padStart(2,'0'); }
-function isEventDay(y,m,d){ return EVENT_DATES.has(y+'-'+pad2(m+1)+'-'+pad2(d)); }
-function isPredictDay(y,m,d){ const dt=new Date(y,m,d); return dt>=PREDICT_START && dt<=PREDICT_END; }
-
+function isEventDay(y,m,d){
+  const key = y+'-'+pad2(m+1)+'-'+pad2(d);
+  return TYPES[currentType].records.some(r=>r.date===key);
+}
+function isPredictDay(y,m,d){
+  if(!currentStats || currentStats.status==='cold') return false;
+  const dt = new Date(y,m,d);
+  return dt>=currentStats.nextDate && dt<=currentStats.windowEnd;
+}
 function buildMonthRows(y,m){
-  let dow = new Date(y,m,1).getDay(); // 0=Вс..6=Сб
-  dow = (dow+6)%7; // переводим на Пн=0
+  let dow = new Date(y,m,1).getDay();
+  dow = (dow+6)%7;
   const daysInMonth = new Date(y,m+1,0).getDate();
   const cells=[];
   for(let i=0;i<dow;i++) cells.push('<td class="empty"></td>');
@@ -287,7 +603,6 @@ function buildMonthRows(y,m){
   for(let i=0;i<cells.length;i+=7){ html += '<tr>'+cells.slice(i,i+7).join('')+'</tr>'; }
   return html;
 }
-
 function renderCalendars(){
   const y1=calBase.getFullYear(), m1=calBase.getMonth();
   const right=new Date(y1,m1+1,1);
@@ -301,7 +616,12 @@ function calPrev(){ calBase = new Date(calBase.getFullYear(), calBase.getMonth()
 function calNext(){ calBase = new Date(calBase.getFullYear(), calBase.getMonth()+1, 1); renderCalendars(); }
 function calToday(){ calBase = new Date(2026,7,1); renderCalendars(); }
 
-renderCalendars();
+// ---------------------------------------------------------------
+// Инициализация
+// ---------------------------------------------------------------
+loadState();
+renderHome();
+renderDetail();
 </script>
 </body>
 </html>
