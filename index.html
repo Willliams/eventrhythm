@@ -129,7 +129,7 @@
   .modal-error{color:var(--fg); font-weight:bold; font-size:10.5px; margin-top:6px; min-height:12px;}
 
   /* На реальном телефоне рамка занимает весь экран — не нужно увеличивать/уменьшать вручную */
-  @media (max-width:400px){
+  @media (max-width:600px){
     body{ padding:0; }
     .phone{
       width:100%; height:100vh; height:100dvh; max-width:100%; border-radius:0; padding:10px 8px 6px;
@@ -282,6 +282,7 @@
       <span onclick="toggleLang()"><span class="fkey">F8</span> <span id="lbl-f8">English</span></span>
       <span onclick="showScreen('analytics')"><span class="fkey">F9</span> <span id="lbl-f9">Аналитика</span></span>
       <span onclick="showScreen('home')"><span class="fkey">F10</span> <span id="lbl-f10">Главная</span></span>
+      <span style="cursor:default; color:#555; font-weight:normal;" id="build-tag">build 6</span>
     </div>
     </div>
   </div>
@@ -362,7 +363,7 @@ const I18N = {
       manualTitle:'РУЧНОЙ ВВОД',
       manualText:'Укажите дату и значение. Если на эту дату уже есть запись — она будет обновлена. Данные сохраняются в браузере и не пропадают при перезагрузке страницы.',
       manageTitle:'СВОИ ТИПЫ СОБЫТИЙ',
-      manageText:'Кнопка «+ Новый тип» на главной (или F5) — создать свой тип: название, что измерять (время или количество) и единица. На экране деталей внизу — «Удалить тип», чтобы убрать ненужный вместе со всеми его записями.',
+      manageText:'Кнопка «+ Новый тип» на главной (или F5) — создать свой тип: название, что измерять (время или количество) и единица. Поле «Что измеряем» влияет только на подпись в интерфейсе («ожидаемая длительность» / «ожидаемое количество») — сам расчёт прогноза одинаковый для обоих вариантов, выбирайте тот, что ближе по смыслу (например, для заправки — «Количество», единица «л»). На экране деталей внизу — «Удалить тип», чтобы убрать ненужный вместе со всеми его записями.',
       analyticsTitle:'АНАЛИТИКА',
       analyticsText:'Сводные цифры по всем циклам, уверенность прогноза (зависит от числа записей и стабильности интервалов между ними) и тренд по каждому событию.',
       resetTitle:'СБРОС',
@@ -439,7 +440,7 @@ const I18N = {
       manualTitle:'MANUAL ENTRY',
       manualText:'Enter a date and a value. If an entry already exists for that date, it will be updated. Data is saved in the browser and survives page reloads.',
       manageTitle:'YOUR OWN EVENT TYPES',
-      manageText:'The "+ New type" button on the home screen (or F5) creates your own type: name, what to measure (time or quantity), and a unit. On the details screen, "Delete type" at the bottom removes one along with all its records.',
+      manageText:'The "+ New type" button on the home screen (or F5) creates your own type: name, what to measure (time or quantity), and a unit. The "what to measure" field only changes the wording shown in the app ("expected duration" / "expected amount") — the forecast is calculated the same way either way, so just pick whichever fits (e.g. for fuel, choose "Quantity" with unit "L"). On the details screen, "Delete type" at the bottom removes one along with all its records.',
       analyticsTitle:'ANALYTICS',
       analyticsText:'Summary figures across all cycles, forecast confidence (depends on record count and how consistent the intervals are) and the trend for each event.',
       resetTitle:'RESET',
