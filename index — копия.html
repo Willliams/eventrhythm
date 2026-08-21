@@ -31,13 +31,13 @@
   }
   .crt{
     width:100%; background:var(--bg); color:var(--fg);
-    padding:0; font-size:13.5px; line-height:1.5;
+    padding:0; font-size:12.5px; line-height:1.5;
     border-top:4px double var(--fg-dim); border-bottom:4px double var(--fg-dim);
     position:relative; flex:1; display:flex; flex-direction:column; min-height:0;
   }
   .titlebar{
     color:var(--fg); font-weight:bold; text-align:center;
-    padding:5px 4px; letter-spacing:1px; border-bottom:1px solid var(--fg-dim); font-size:12px;
+    padding:5px 4px; letter-spacing:1px; border-bottom:1px solid var(--fg-dim); font-size:11px;
     flex-shrink:0;
   }
   .inner{padding:8px 12px 8px; flex:1; overflow-y:auto;}
@@ -49,7 +49,7 @@
 
   .twrap{overflow-x:auto; margin-bottom:10px;}
   table{border-collapse:collapse; width:100%; margin-bottom:0;}
-  th,td{border:1px solid var(--fg-dim); padding:4px 5px; text-align:left; font-size:12px; white-space:nowrap;}
+  th,td{border:1px solid var(--fg-dim); padding:4px 5px; text-align:left; font-size:11px; white-space:nowrap;}
   th{color:var(--fg-dim); font-weight:bold; text-transform:uppercase; letter-spacing:.5px;}
   tr{cursor:pointer;}
   tr.sel td{background:var(--sel-bg); color:var(--sel-text); font-weight:bold;}
@@ -75,35 +75,32 @@
   .panel.hero .big{color:var(--fg); font-weight:bold; font-size:16px; margin:4px 0;}
   .panel.action{text-align:center; cursor:pointer; color:var(--fg); font-weight:bold;}
   .panel.action.danger{color:var(--fg-dim); font-weight:normal;}
-  .bar-row{display:flex; align-items:center; gap:6px; margin:3px 0; font-size:12px;}
+  .bar-row{display:flex; align-items:center; gap:6px; margin:3px 0; font-size:11px;}
   .bar-track{flex:1; height:9px; border:1px solid var(--fg-dim); position:relative;}
   .bar-fill{position:absolute; top:0; left:0; bottom:0; background:var(--fg);}
   .bar-label{width:78px; color:var(--fg-dim); flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .bar-val{width:28px; text-align:right; color:var(--fg); flex-shrink:0;}
 
-  .cal-nav{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:12px;}
+  .cal-nav{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:11px;}
   .cal-nav-btn{color:var(--fg); cursor:pointer; text-decoration:underline;}
   .calgrid{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; justify-content:center;}
-  .cal h4{color:var(--fg); font-size:10.5px; font-weight:bold; margin:0 0 5px; letter-spacing:.5px;}
-  .cal table{width:auto; margin-bottom:0; border-collapse:separate; border-spacing:0;}
+  .cal h4{color:var(--fg); font-size:10px; font-weight:bold; margin:0 0 5px; letter-spacing:.5px;}
+  .cal table{width:auto; margin-bottom:0;}
   .cal th, .cal td{
-    width:19px; height:18px; text-align:center; padding:0; font-size:10px;
+    width:18px; height:17px; text-align:center; padding:0; font-size:9.5px;
     border:1px solid var(--fg-dim); color:var(--fg-dim);
   }
   .cal th{color:var(--fg-dim); text-transform:none; font-weight:normal;}
   .cal td.empty{border-color:transparent;}
   .cal td.event{background:var(--fg); color:#000; font-weight:bold; border-color:var(--fg);}
-  .cal td.event-start{background:var(--fg); color:#000; font-weight:bold; border-color:var(--fg); border-right:none;}
-  .cal td.event-end{background:var(--fg); color:#000; font-weight:bold; border-color:var(--fg); border-left:none;}
-  .cal td.event-mid{background:var(--fg-dim); color:#000; border-color:var(--fg-dim); border-left:none; border-right:none;}
   .cal td.predict{color:var(--fg); font-weight:bold; border:1px dashed var(--fg);}
-  .cal-legend{font-size:10.5px; color:var(--fg-dim); margin-bottom:10px; text-align:center;}
+  .cal-legend{font-size:10px; color:var(--fg-dim); margin-bottom:10px; text-align:center;}
   .cal-legend .sw{display:inline-block; width:10px; height:10px; vertical-align:-1px; margin-right:4px;}
   .cal-legend .sw.ev{background:var(--fg);}
   .cal-legend .sw.pr{border:1px dashed var(--fg);}
 
   .footer{
-    border-top:1px solid var(--fg-dim); color:var(--fg-dim); display:flex; font-size:11px; font-weight:bold;
+    border-top:1px solid var(--fg-dim); color:var(--fg-dim); display:flex; font-size:10px; font-weight:bold;
     padding:5px 4px; gap:4px 10px; flex-wrap:wrap; justify-content:center;
   }
   .fkey{color:var(--fg); cursor:pointer;}
@@ -139,8 +136,8 @@
       box-shadow:none;
     }
     .notch{ width:70px; }
-    .crt{ font-size:14.5px; }
-    .titlebar{ font-size:13px; }
+    .crt{ font-size:13.5px; }
+    .titlebar{ font-size:12px; }
   }
 </style>
 </head>
@@ -198,8 +195,6 @@
 
         <div class="panel" id="detail-last"></div>
 
-        <div class="panel" id="detail-timer-status" style="display:none;"></div>
-        <div class="panel action" id="detail-timer-btn" style="display:none;"></div>
         <div class="panel action" id="lbl-add-manual" onclick="openManualEntry(currentType)">[ + Ввести вручную ]</div>
         <div class="panel action danger" id="lbl-delete-type" onclick="deleteCurrentType()">[ Удалить тип ]</div>
       </div>
@@ -236,7 +231,6 @@
     <div class="modal-overlay" id="modal-overlay">
       <div class="modal panel hero">
         <div class="kicker"><span id="lbl-modal-new">НОВАЯ ЗАПИСЬ —</span> <span id="modal-type-name"></span></div>
-        <div id="modal-timer-hint" style="display:none; color:var(--fg-dim); font-size:11px; margin-top:6px;"></div>
         <div class="modal-field">
           <label id="lbl-modal-date">Дата</label>
           <input type="date" id="modal-date">
@@ -288,7 +282,7 @@
       <span onclick="toggleLang()"><span class="fkey">F8</span> <span id="lbl-f8">English</span></span>
       <span onclick="showScreen('analytics')"><span class="fkey">F9</span> <span id="lbl-f9">Аналитика</span></span>
       <span onclick="showScreen('home')"><span class="fkey">F10</span> <span id="lbl-f10">Главная</span></span>
-      <span style="cursor:default; color:#555; font-weight:normal;" id="build-tag">build 8</span>
+      <span style="cursor:default; color:#555; font-weight:normal;" id="build-tag">build 7</span>
     </div>
     </div>
   </div>
@@ -358,22 +352,16 @@ const I18N = {
     deleteType:'[ Удалить тип ]',
     confirmDeleteType:n=>'Удалить тип «'+n+'» и все его записи? Это необратимо.',
     confirmReset:'Удалить все типы и записи и начать заново, как новый пользователь? Это необратимо.',
-    timerStart:'[ ▶ Начать ]', timerStop:'[ ■ Завершить ]',
-    timerRunningSince:'ИДЁТ ОТСЧЁТ С',
-    timerBusy:n=>' (занято: '+n+')',
-    timerBusyAlert:n=>'Уже идёт отсчёт для «'+n+'». Сначала завершите его.',
-    timerHintStart:'Начало: ', timerHintEnd:'  →  Конец: ',
-    homeTimerRunning:n=>'  ⏱ идёт: '+n,
     help:{
       title:'Помощь',
       whatTitle:'ЧТО ЭТО',
       whatText:'EventRhythm следит за повторяющимися событиями и предсказывает, когда наступит следующее и сколько времени или объёма оно займёт — по истории ваших записей. Типы событий полностью настраиваются под вас.',
       homeTitle:'ГЛАВНАЯ',
-      homeText:'Таблица циклов. Статус — полоска из 10 клеток: залитые клетки = сколько времени уже прошло с прошлого события, пустые = сколько осталось до прогноза. Пунктир — мало данных, мигание — уже пора. Клик по строке открывает детали, [+] / [▶] — быстрая запись без перехода.',
+      homeText:'Таблица циклов. Статус — полоска из 6 клеток: залитые клетки = сколько времени уже прошло с прошлого события, пустые = сколько осталось до прогноза. Пунктир — мало данных, мигание — уже пора. Клик по строке открывает детали, [+] / [▶] — быстрая запись без перехода.',
       detailTitle:'ДЕТАЛИ',
-      detailText:'Прогноз следующей даты и значения, тренд интервала (ускоряется / стабильно / замедляется), календарь на два месяца — «◀ Назад», «Сегодня», «Вперёд ▶» листают месяцы. Залитый день — прошедшее событие, пунктирный — окно прогноза. Если событие растянуто на несколько дней (например, начато кнопкой «▶ Начать» и длилось больше недели), на календаре оно показывается сплошной подсветкой от даты начала до даты конца.',
-      manualTitle:'РУЧНОЙ ВВОД И ТАЙМЕР',
-      manualText:'Кнопка «+ Ввести вручную» добавляет запись задним числом — дата и значение. Для событий с длительностью доступна кнопка «▶ Начать» — она фиксирует точное время начала; когда событие закончится, нажмите «■ Завершить» — время окончания зафиксируется, а форма записи откроется с уже подставленным значением (посчитанным по прошедшему времени), которое можно поправить перед сохранением. Одновременно может идти только один отсчёт. Если на эту дату уже есть запись — она будет обновлена. Данные сохраняются в браузере и не пропадают при перезагрузке страницы.',
+      detailText:'Прогноз следующей даты и значения, тренд интервала (ускоряется / стабильно / замедляется), календарь на два месяца — «◀ Назад», «Сегодня», «Вперёд ▶» листают месяцы. Залитый день — прошедшее событие, пунктирный — окно прогноза. Кнопка «+ Ввести вручную» добавляет запись для текущего события.',
+      manualTitle:'РУЧНОЙ ВВОД',
+      manualText:'Укажите дату и значение. Если на эту дату уже есть запись — она будет обновлена. Данные сохраняются в браузере и не пропадают при перезагрузке страницы.',
       manageTitle:'СВОИ ТИПЫ СОБЫТИЙ',
       manageText:'Кнопка «+ Новый тип» на главной (или F5) — создать свой тип: название, что измерять (время или количество) и единица. Поле «Что измеряем» влияет только на подпись в интерфейсе («ожидаемая длительность» / «ожидаемое количество») — сам расчёт прогноза одинаковый для обоих вариантов, выбирайте тот, что ближе по смыслу (например, для заправки — «Количество», единица «л»). На экране деталей внизу — «Удалить тип», чтобы убрать ненужный вместе со всеми его записями.',
       analyticsTitle:'АНАЛИТИКА',
@@ -441,22 +429,16 @@ const I18N = {
     deleteType:'[ Delete type ]',
     confirmDeleteType:n=>'Delete type "'+n+'" and all its records? This cannot be undone.',
     confirmReset:'Delete all types and records and start over as a new user? This cannot be undone.',
-    timerStart:'[ ▶ Start ]', timerStop:'[ ■ Stop ]',
-    timerRunningSince:'RUNNING SINCE',
-    timerBusy:n=>' (busy: '+n+')',
-    timerBusyAlert:n=>'A timer is already running for "'+n+'". Finish it first.',
-    timerHintStart:'Start: ', timerHintEnd:'  →  End: ',
-    homeTimerRunning:n=>'  ⏱ running: '+n,
     help:{
       title:'Help',
       whatTitle:'WHAT THIS IS',
       whatText:'EventRhythm tracks recurring events and predicts when the next one will happen and how long or how much it will take — based on the history of your entries. Event types are fully customizable.',
       homeTitle:'HOME',
-      homeText:'Table of cycles. Status is a 10-cell bar: filled cells = how much time has passed since the last event, empty = how much is left until the forecast. Dashed = not enough data, blinking = due now. Click a row to open details, [+] / [▶] adds an entry without leaving the list.',
+      homeText:'Table of cycles. Status is a 6-cell bar: filled cells = how much time has passed since the last event, empty = how much is left until the forecast. Dashed = not enough data, blinking = due now. Click a row to open details, [+] / [▶] adds an entry without leaving the list.',
       detailTitle:'DETAILS',
-      detailText:'Forecast of the next date and value, interval trend (speeding up / stable / slowing down), a two-month calendar — "◀ Back", "Today", "Next ▶" page through months. A filled day is a past event, a dashed one is the forecast window. If an event spans several days (e.g. started with "▶ Start" and lasted more than a week), the calendar shows it as a continuous highlighted range from the start date to the end date.',
-      manualTitle:'MANUAL ENTRY & TIMER',
-      manualText:'The "+ Add manually" button logs a backdated entry — a date and a value. For duration-type events, a "▶ Start" button is also available — it records the exact start time; when the event ends, press "■ Stop" to record the end time, and the entry form opens pre-filled with a value computed from the elapsed time, which you can adjust before saving. Only one timer can run at a time. If an entry already exists for that date, it will be updated. Data is saved in the browser and survives page reloads.',
+      detailText:'Forecast of the next date and value, interval trend (speeding up / stable / slowing down), a two-month calendar — "◀ Back", "Today", "Next ▶" page through months. A filled day is a past event, a dashed one is the forecast window. The "+ Add manually" button logs an entry for the current event.',
+      manualTitle:'MANUAL ENTRY',
+      manualText:'Enter a date and a value. If an entry already exists for that date, it will be updated. Data is saved in the browser and survives page reloads.',
       manageTitle:'YOUR OWN EVENT TYPES',
       manageText:'The "+ New type" button on the home screen (or F5) creates your own type: name, what to measure (time or quantity), and a unit. The "what to measure" field only changes the wording shown in the app ("expected duration" / "expected amount") — the forecast is calculated the same way either way, so just pick whichever fits (e.g. for fuel, choose "Quantity" with unit "L"). On the details screen, "Delete type" at the bottom removes one along with all its records.',
       analyticsTitle:'ANALYTICS',
@@ -655,7 +637,8 @@ function renderHome(){
     if(stats.confidence==='high') highConf++;
     const st = statusTextAndClass(stats);
     const icon = t.measure==='duration' ? '▶' : '+';
-    rows += '<tr onclick="openDetail(\''+id+'\')">'+
+    const selCls = id===currentType ? ' sel' : '';
+    rows += '<tr class="'+selCls.trim()+'" onclick="openDetail(\''+id+'\')">'+
       '<td>'+String(ORDER.indexOf(id)+1).padStart(2,'0')+'</td><td>'+t.name+'</td>'+
       '<td class="'+st.cls+'"><span class="st-cell">'+segBarHtml(stats)+'<span class="st-txt">'+st.text+'</span></span></td>'+
       '<td class="btn-cell"><span class="act" onclick="event.stopPropagation(); openManualEntry(\''+id+'\')">['+icon+']</span></td>'+
@@ -663,9 +646,8 @@ function renderHome(){
   });
   document.getElementById('home-rows').innerHTML = rows;
   const highConfPct = Math.round(highConf/ORDER.length*100);
-  const timerNote = (activeTimer && TYPES[activeTimer.typeId]) ? L().homeTimerRunning(TYPES[activeTimer.typeId].name) : '';
   document.getElementById('home-summary').innerHTML =
-    '<span class="k">'+L().summaryLabel+'</span> '+L().summaryTotal+' '+totalRecords+' &nbsp; '+L().summaryActive+' '+activeRhythms+' &nbsp; '+L().summaryHighConf+' '+highConfPct+'%'+timerNote;
+    '<span class="k">'+L().summaryLabel+'</span> '+L().summaryTotal+' '+totalRecords+' &nbsp; '+L().summaryActive+' '+activeRhythms+' &nbsp; '+L().summaryHighConf+' '+highConfPct+'%';
 }
 
 // ---------------------------------------------------------------
@@ -723,12 +705,6 @@ function renderDetail(){
 
   calBase = new Date(2026,7,1);
   renderCalendars();
-
-  renderTimerPanel();
-  if(timerTickHandle){ clearInterval(timerTickHandle); timerTickHandle = null; }
-  if(activeTimer && activeTimer.typeId===currentType){
-    timerTickHandle = setInterval(renderTimerPanel, 1000);
-  }
 }
 
 function openDetail(typeId){
@@ -824,7 +800,6 @@ function renderHelp(){
 // Ручной ввод записи
 // ---------------------------------------------------------------
 let modalTypeId = null;
-let pendingTimer = null; // {startAt, endAt} — заполняется при остановке таймера, прикрепляется к записи при сохранении
 function refreshModalLabels(){
   if(!modalTypeId || !TYPES[modalTypeId]) return;
   const t = TYPES[modalTypeId];
@@ -832,33 +807,18 @@ function refreshModalLabels(){
   document.getElementById('modal-value-label').textContent =
     t.measure==='duration' ? L().modalDurationLabel(t.unit) : L().modalQuantityLabel(t.unit);
 }
-function openManualEntry(typeId, timerInfo){
+function openManualEntry(typeId){
   if(!typeId || !TYPES[typeId]) return;
   modalTypeId = typeId;
   refreshModalLabels();
-  pendingTimer = timerInfo || null;
-  const hintEl = document.getElementById('modal-timer-hint');
-  if(pendingTimer){
-    const sd = new Date(pendingTimer.startAt), ed = new Date(pendingTimer.endAt);
-    const t = TYPES[typeId];
-    const computed = Math.round(convertMsToUnit(ed-sd, t.unit)*10)/10;
-    document.getElementById('modal-date').value = fmtISO(ed);
-    document.getElementById('modal-value').value = computed>0 ? computed : '';
-    hintEl.textContent = L().timerHintStart+fmtDT(sd)+L().timerHintEnd+fmtDT(ed);
-    hintEl.style.display = 'block';
-  }else{
-    document.getElementById('modal-date').value = fmtISO(TODAY);
-    document.getElementById('modal-value').value = '';
-    hintEl.textContent = '';
-    hintEl.style.display = 'none';
-  }
+  document.getElementById('modal-date').value = fmtISO(TODAY);
+  document.getElementById('modal-value').value = '';
   document.getElementById('modal-error').textContent = '';
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeManualEntry(){
   document.getElementById('modal-overlay').classList.remove('open');
   modalTypeId = null;
-  pendingTimer = null;
 }
 function submitManualEntry(){
   const dateStr = document.getElementById('modal-date').value;
@@ -870,17 +830,13 @@ function submitManualEntry(){
 
   const t = TYPES[modalTypeId];
   const idx = t.records.findIndex(r=>r.date===dateStr);
-  const rec = { date:dateStr, value:val };
-  if(pendingTimer){ rec.start = pendingTimer.startAt; rec.end = pendingTimer.endAt; }
-  if(idx>=0) t.records[idx] = Object.assign({}, t.records[idx], rec);
-  else t.records.push(rec);
+  if(idx>=0) t.records[idx].value = val; else t.records.push({date:dateStr, value:val});
 
-  const savedTypeId = modalTypeId;
   saveState();
   closeManualEntry();
   renderHome();
   renderAnalytics();
-  if(document.getElementById('screen-detail').classList.contains('active') && currentType===savedTypeId) renderDetail();
+  if(document.getElementById('screen-detail').classList.contains('active') && currentType===modalTypeId) renderDetail();
 }
 
 // ---------------------------------------------------------------
@@ -927,97 +883,6 @@ function submitNewType(){
 }
 
 // ---------------------------------------------------------------
-// Таймер: старт/стоп для фиксации начала и конца события
-// ---------------------------------------------------------------
-const TIMER_KEY = 'eventrhythm_pg_timer';
-let activeTimer = null; // {typeId, startAt: ISO-строка}
-let timerTickHandle = null;
-
-function loadTimer(){
-  try{
-    const raw = localStorage.getItem(TIMER_KEY);
-    if(raw) activeTimer = JSON.parse(raw);
-  }catch(e){ /* игнорируем */ }
-}
-function saveTimer(){
-  try{
-    if(activeTimer) localStorage.setItem(TIMER_KEY, JSON.stringify(activeTimer));
-    else localStorage.removeItem(TIMER_KEY);
-  }catch(e){ /* игнорируем */ }
-}
-function fmtDT(d){
-  return pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
-}
-function fmtElapsed(ms){
-  let s = Math.max(0, Math.floor(ms/1000));
-  const days = Math.floor(s/86400); s -= days*86400;
-  const hh = Math.floor(s/3600); s -= hh*3600;
-  const mm = Math.floor(s/60); s -= mm*60;
-  const ss = s;
-  const hhmmss = pad2(hh)+':'+pad2(mm)+':'+pad2(ss);
-  return days>0 ? (days+(lang==='ru'?'д ':'d ')+hhmmss) : hhmmss;
-}
-// Переводит миллисекунды в значение выбранной единицы измерения по эвристике названия
-function convertMsToUnit(ms, unit){
-  const u = String(unit||'').toLowerCase();
-  const mins = ms/60000;
-  if(/^(мин|min|m)/.test(u)) return mins;
-  if(/^(нед|week|w)/.test(u)) return mins/10080;
-  if(/^(д|day|d)/.test(u)) return mins/1440;
-  if(/^(ч|час|h)/.test(u)) return mins/60;
-  return mins/60; // по умолчанию — часы
-}
-function startTimer(typeId){
-  if(activeTimer && activeTimer.typeId!==typeId){
-    const other = TYPES[activeTimer.typeId] ? TYPES[activeTimer.typeId].name : '';
-    alert(L().timerBusyAlert(other));
-    return;
-  }
-  activeTimer = { typeId, startAt: new Date().toISOString() };
-  saveTimer();
-  renderHome();
-  renderDetail();
-}
-function stopTimer(){
-  if(!activeTimer) return;
-  const typeId = activeTimer.typeId;
-  const startAt = activeTimer.startAt;
-  const endAt = new Date().toISOString();
-  activeTimer = null;
-  saveTimer();
-  if(timerTickHandle){ clearInterval(timerTickHandle); timerTickHandle = null; }
-  renderHome();
-  openManualEntry(typeId, { startAt, endAt });
-}
-function renderTimerPanel(){
-  const statusEl = document.getElementById('detail-timer-status');
-  const btnEl = document.getElementById('detail-timer-btn');
-  if(!statusEl || !btnEl) return;
-  const t = TYPES[currentType];
-  if(!t || t.measure!=='duration'){
-    statusEl.style.display = 'none';
-    btnEl.style.display = 'none';
-    return;
-  }
-  const running = activeTimer && activeTimer.typeId===currentType;
-  if(running){
-    const elapsed = Date.now() - new Date(activeTimer.startAt).getTime();
-    statusEl.style.display = '';
-    statusEl.innerHTML = '<div class="kicker">'+L().timerRunningSince+' '+fmtDT(new Date(activeTimer.startAt))+'</div>'+
-      '<div class="big" style="color:var(--fg); font-weight:bold; font-size:16px; margin-top:4px;">'+fmtElapsed(elapsed)+'</div>';
-    btnEl.style.display = '';
-    btnEl.textContent = L().timerStop;
-    btnEl.onclick = stopTimer;
-  }else{
-    statusEl.style.display = 'none';
-    btnEl.style.display = '';
-    const other = activeTimer && TYPES[activeTimer.typeId] ? TYPES[activeTimer.typeId].name : null;
-    btnEl.textContent = L().timerStart + (other ? L().timerBusy(other) : '');
-    btnEl.onclick = function(){ startTimer(currentType); };
-  }
-}
-
-// ---------------------------------------------------------------
 // Навигация по экранам и локализация статических подписей
 // ---------------------------------------------------------------
 function titleForScreen(name){
@@ -1041,7 +906,6 @@ function showScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
   document.getElementById('titlebar').textContent = titleForScreen(name);
-  if(name!=='detail' && timerTickHandle){ clearInterval(timerTickHandle); timerTickHandle = null; }
   if(name==='home') renderHome();
   if(name==='analytics') renderAnalytics();
   if(name==='help') renderHelp();
@@ -1119,30 +983,10 @@ function toggleLang(){
 // ---------------------------------------------------------------
 let calBase = new Date(2026,7,1);
 
-// Диапазоны дат для записей текущего типа: [начало, конец] по дням (без времени).
-// Для обычных записей (без start/end) начало = конец = дата записи — одна ячейка.
-// Для записей от таймера диапазон может растягиваться на много дней.
-function eventRangesForType(t){
-  return t.records.map(r=>{
-    const start = r.start ? new Date(r.start) : new Date(r.date+'T00:00:00');
-    const end = r.end ? new Date(r.end) : new Date(r.date+'T00:00:00');
-    const sd = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-    const ed = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-    return ed>=sd ? {start:sd, end:ed} : {start:ed, end:sd};
-  });
-}
-function dayEventClass(y,m,d,ranges){
-  const dt = new Date(y,m,d);
-  for(let i=0;i<ranges.length;i++){
-    const r = ranges[i];
-    if(dt>=r.start && dt<=r.end){
-      if(r.start.getTime()===r.end.getTime()) return 'event';
-      if(dt.getTime()===r.start.getTime()) return 'event-start';
-      if(dt.getTime()===r.end.getTime()) return 'event-end';
-      return 'event-mid';
-    }
-  }
-  return null;
+function isEventDay(y,m,d){
+  if(!currentType || !TYPES[currentType]) return false;
+  const key = y+'-'+pad2(m+1)+'-'+pad2(d);
+  return TYPES[currentType].records.some(r=>r.date===key);
 }
 function isPredictDay(y,m,d){
   if(!currentStats || currentStats.status==='cold') return false;
@@ -1154,13 +998,10 @@ function buildMonthRows(y,m){
   dow = (dow+6)%7;
   const daysInMonth = new Date(y,m+1,0).getDate();
   const cells=[];
-  const t = TYPES[currentType];
-  const ranges = t ? eventRangesForType(t) : [];
   for(let i=0;i<dow;i++) cells.push('<td class="empty"></td>');
   for(let d=1; d<=daysInMonth; d++){
     let cls='';
-    const evCls = dayEventClass(y,m,d,ranges);
-    if(evCls) cls=' class="'+evCls+'"';
+    if(isEventDay(y,m,d)) cls=' class="event"';
     else if(isPredictDay(y,m,d)) cls=' class="predict"';
     cells.push('<td'+cls+'>'+d+'</td>');
   }
@@ -1189,7 +1030,6 @@ function calToday(){ calBase = new Date(2026,7,1); renderCalendars(); }
 // ---------------------------------------------------------------
 loadLang();
 loadState();
-loadTimer();
 if(!TYPES[currentType]) currentType = ORDER.length ? ORDER[0] : null;
 applyStaticLabels();
 renderHelp();
